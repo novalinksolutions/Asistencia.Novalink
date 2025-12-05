@@ -18,7 +18,7 @@ from app.states.login_state import LoginState
 from app.utils.assets import ensure_assets
 
 
-def index() -> rx.Component:
+def dashboard() -> rx.Component:
     return base_layout(
         rx.match(
             BaseState.active_page,
@@ -56,6 +56,10 @@ def index() -> rx.Component:
     )
 
 
+def index() -> rx.Component:
+    return rx.el.div(on_mount=rx.redirect("/login"))
+
+
 ensure_assets()
 app = rx.App(
     theme=rx.theme(appearance="light", radius="large", accent_color="blue"),
@@ -78,5 +82,6 @@ app = rx.App(
             """)
     ],
 )
-app.add_page(index, route="/", on_load=BaseState.check_login)
+app.add_page(index, route="/")
+app.add_page(dashboard, route="/dashboard", on_load=BaseState.check_login)
 app.add_page(login_page, route="/login", on_load=LoginState.on_load)

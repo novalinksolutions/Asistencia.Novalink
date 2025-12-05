@@ -249,7 +249,7 @@ class LoginState(DatabaseState):
             yield rx.toast.success(
                 f"¡Bienvenido {user['nombre']}! Conectado a {selected_company['name']}"
             )
-            yield rx.redirect("/")
+            yield rx.redirect("/dashboard")
         except Exception as e:
             logging.exception(f"Login error: {e}")
             self.error_message = f"Error durante el inicio de sesión: {str(e)}"
