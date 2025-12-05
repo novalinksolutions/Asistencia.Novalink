@@ -169,6 +169,23 @@ class EntidadesState(DatabaseState):
             logging.exception(
                 f"Migration: Could not add column 'activo' to grupos: {e}"
             )
+        try:
+            create_query = """
+                CREATE TABLE IF NOT EXISTS public.tipoempleado (
+                    codigo INTEGER PRIMARY KEY,
+                    descripcion TEXT,
+                    fechacreacion TIMESTAMP,
+                    usuario TEXT,
+                    activo BOOLEAN DEFAULT true
+                )
+            """
+            await self._execute_write(create_query, target_db=target_db)
+            query = "ALTER TABLE public.tipoempleado ADD COLUMN IF NOT EXISTS activo BOOLEAN DEFAULT true"
+            await self._execute_write(query, target_db=target_db)
+        except Exception as e:
+            logging.exception(
+                f"Migration: Could not ensure tipoempleado table/column: {e}"
+            )
 
     @rx.event
     async def on_load(self):
@@ -188,6 +205,8 @@ class EntidadesState(DatabaseState):
         if self.selected_nivel == "cargos" or self.selected_nivel == "grupos":
             parent_table = "niveladm1"
             target_list = "nivel1"
+        elif self.selected_nivel == "tipoempleado":
+            return
         else:
             try:
                 parent_level = int(self.selected_nivel) - 1
@@ -245,6 +264,19 @@ class EntidadesState(DatabaseState):
                         COALESCE(activo, true) as activo,
                         COALESCE(niveladm1, 0) as parent_id
                     FROM public.grupos 
+                    ORDER BY descripcion ASC
+                """
+            elif self.selected_nivel == "tipoempleado":
+                query = """
+                    SELECT 
+                        codigo,
+                        descripcion,
+                        COALESCE(to_char(fechacreacion, 'YYYY-MM-DD HH24:MI'), '') as fecha_creacion,
+                        COALESCE(usuario, '') as usuario,
+                        '' as cod_alterno,
+                        COALESCE(activo, true) as activo,
+                        0 as parent_id
+                    FROM public.tipoempleado 
                     ORDER BY descripcion ASC
                 """
             else:
@@ -442,6 +474,45 @@ class EntidadesState(DatabaseState):
                         },
                     )
                     rx.toast.success("Grupo actualizado correctamente.")
+            elif self.selected_nivel == "tipoempleado":
+                if self.selected_item["codigo"] == 0:
+                    next_id_res = await self._execute_query(
+                        "SELECT COALESCE(MAX(codigo), 0) + 1 as next_id FROM public.tipoempleado"
+                    )
+                    next_id = next_id_res[0]["next_id"] if next_id_res else 1
+                    query = """
+                        INSERT INTO public.tipoempleado 
+                        (codigo, descripcion, fechacreacion, usuario, activo)
+                        VALUES (:id, :desc, NOW(), :user, :active)
+                    """
+                    await self._execute_write(
+                        query,
+                        {
+                            "id": next_id,
+                            "desc": self.selected_item["descripcion"],
+                            "user": current_user,
+                            "active": self.selected_item["activo"],
+                        },
+                    )
+                    rx.toast.success("Tipo de empleado creado correctamente.")
+                else:
+                    query = """
+                        UPDATE public.tipoempleado 
+                        SET descripcion = :desc, 
+                            usuario = :user, 
+                            activo = :active
+                        WHERE codigo = :id
+                    """
+                    await self._execute_write(
+                        query,
+                        {
+                            "id": self.selected_item["codigo"],
+                            "desc": self.selected_item["descripcion"],
+                            "user": current_user,
+                            "active": self.selected_item["activo"],
+                        },
+                    )
+                    rx.toast.success("Tipo de empleado actualizado correctamente.")
             elif self.selected_item["codigo"] == 0:
                 next_id_res = await self._execute_query(
                     f"SELECT COALESCE(MAX(codigo), 0) + 1 as next_id FROM public.{self.table_name}"
@@ -506,6 +577,7 @@ class EntidadesState(DatabaseState):
                 configs.append({"id": str(i), "label": label})
             configs.append({"id": "cargos", "label": "Cargos"})
             configs.append({"id": "grupos", "label": "Grupos"})
+            configs.append({"id": "tipoempleado", "label": "Tipo Empleado"})
             self.niveles_config = configs
             try:
                 available_ids = [c["id"] for c in configs]
@@ -528,6 +600,8 @@ class EntidadesState(DatabaseState):
             self.table_name = "cargos"
         elif value == "grupos":
             self.table_name = "grupos"
+        elif value == "tipoempleado":
+            self.table_name = "tipoempleado"
         else:
             self.table_name = f"niveladm{value}"
         self.cancel_edit()
