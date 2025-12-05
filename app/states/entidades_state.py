@@ -119,6 +119,8 @@ class EntidadesState(DatabaseState):
             self.selected_parent_nivel4 = parent_id_str
         elif self.selected_nivel == "cargos":
             self.selected_parent_nivel1 = parent_id_str
+        elif self.selected_nivel == "grupos":
+            self.selected_parent_nivel1 = parent_id_str
 
     @rx.event
     def cancel_edit(self):
@@ -160,6 +162,13 @@ class EntidadesState(DatabaseState):
             logging.exception(
                 f"Migration: Could not add column 'activo' to cargos: {e}"
             )
+        try:
+            query = "ALTER TABLE public.grupos ADD COLUMN IF NOT EXISTS activo BOOLEAN DEFAULT true"
+            await self._execute_write(query, target_db=target_db)
+        except Exception as e:
+            logging.exception(
+                f"Migration: Could not add column 'activo' to grupos: {e}"
+            )
 
     @rx.event
     async def on_load(self):
@@ -176,7 +185,7 @@ class EntidadesState(DatabaseState):
         """Load items from the parent level table based on current selection."""
         parent_table = ""
         target_list = ""
-        if self.selected_nivel == "cargos":
+        if self.selected_nivel == "cargos" or self.selected_nivel == "grupos":
             parent_table = "niveladm1"
             target_list = "nivel1"
         else:
@@ -225,6 +234,19 @@ class EntidadesState(DatabaseState):
                     FROM public.cargos 
                     ORDER BY descripcion ASC
                 """
+            elif self.selected_nivel == "grupos":
+                query = """
+                    SELECT 
+                        codigo,
+                        descripcion,
+                        COALESCE(to_char(fechacreacion, 'YYYY-MM-DD HH24:MI'), '') as fecha_creacion,
+                        COALESCE(usuario, '') as usuario,
+                        '' as cod_alterno,
+                        COALESCE(activo, true) as activo,
+                        COALESCE(niveladm1, 0) as parent_id
+                    FROM public.grupos 
+                    ORDER BY descripcion ASC
+                """
             else:
                 parent_col = ""
                 if self.selected_nivel == "2":
@@ -262,6 +284,15 @@ class EntidadesState(DatabaseState):
         parent_updates = {}
         try:
             if self.selected_nivel == "cargos":
+                p_val = (
+                    int(self.selected_parent_nivel1)
+                    if self.selected_parent_nivel1
+                    else 0
+                )
+                if p_val == 0:
+                    return rx.toast.error("Debe seleccionar el nivel superior.")
+                parent_updates["niveladm1"] = p_val
+            elif self.selected_nivel == "grupos":
                 p_val = (
                     int(self.selected_parent_nivel1)
                     if self.selected_parent_nivel1
@@ -369,6 +400,48 @@ class EntidadesState(DatabaseState):
                         },
                     )
                     rx.toast.success("Cargo actualizado correctamente.")
+            elif self.selected_nivel == "grupos":
+                if self.selected_item["codigo"] == 0:
+                    next_id_res = await self._execute_query(
+                        "SELECT COALESCE(MAX(codigo), 0) + 1 as next_id FROM public.grupos"
+                    )
+                    next_id = next_id_res[0]["next_id"] if next_id_res else 1
+                    query = """
+                        INSERT INTO public.grupos 
+                        (codigo, descripcion, niveladm1, fechacreacion, usuario, activo)
+                        VALUES (:id, :desc, :p_id, NOW(), :user, :active)
+                    """
+                    await self._execute_write(
+                        query,
+                        {
+                            "id": next_id,
+                            "desc": self.selected_item["descripcion"],
+                            "p_id": parent_updates["niveladm1"],
+                            "user": current_user,
+                            "active": self.selected_item["activo"],
+                        },
+                    )
+                    rx.toast.success("Grupo creado correctamente.")
+                else:
+                    query = """
+                        UPDATE public.grupos 
+                        SET descripcion = :desc, 
+                            niveladm1 = :p_id, 
+                            usuario = :user, 
+                            activo = :active
+                        WHERE codigo = :id
+                    """
+                    await self._execute_write(
+                        query,
+                        {
+                            "id": self.selected_item["codigo"],
+                            "desc": self.selected_item["descripcion"],
+                            "p_id": parent_updates["niveladm1"],
+                            "user": current_user,
+                            "active": self.selected_item["activo"],
+                        },
+                    )
+                    rx.toast.success("Grupo actualizado correctamente.")
             elif self.selected_item["codigo"] == 0:
                 next_id_res = await self._execute_query(
                     f"SELECT COALESCE(MAX(codigo), 0) + 1 as next_id FROM public.{self.table_name}"
@@ -417,6 +490,7 @@ class EntidadesState(DatabaseState):
                 {"id": "2", "label": "Sucursal"},
                 {"id": "3", "label": "Departamento"},
                 {"id": "cargos", "label": "Cargos"},
+                {"id": "grupos", "label": "Grupos"},
             ]
             return
         try:
@@ -431,6 +505,7 @@ class EntidadesState(DatabaseState):
                 label = params.get(code, f"Nivel {i}")
                 configs.append({"id": str(i), "label": label})
             configs.append({"id": "cargos", "label": "Cargos"})
+            configs.append({"id": "grupos", "label": "Grupos"})
             self.niveles_config = configs
             try:
                 available_ids = [c["id"] for c in configs]
@@ -451,6 +526,8 @@ class EntidadesState(DatabaseState):
         self.selected_nivel = value
         if value == "cargos":
             self.table_name = "cargos"
+        elif value == "grupos":
+            self.table_name = "grupos"
         else:
             self.table_name = f"niveladm{value}"
         self.cancel_edit()

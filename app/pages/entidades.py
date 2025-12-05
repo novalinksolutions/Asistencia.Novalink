@@ -77,7 +77,8 @@ def form_section() -> rx.Component:
                     ),
                     rx.cond(
                         (EntidadesState.selected_nivel == "2")
-                        | (EntidadesState.selected_nivel == "cargos"),
+                        | (EntidadesState.selected_nivel == "cargos")
+                        | (EntidadesState.selected_nivel == "grupos"),
                         rx.el.div(
                             rx.el.label(
                                 ParametrosGeneralesState.nivel_1,
