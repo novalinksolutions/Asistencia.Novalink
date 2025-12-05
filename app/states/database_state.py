@@ -3,9 +3,14 @@ import os
 from sqlalchemy import create_engine, text
 from sqlalchemy.exc import ProgrammingError, OperationalError
 import logging
+from urllib.parse import urlparse, urlunparse
 
 _engines_cache = {}
-NOVALINK_DB_URL = "postgresql://techind:pgT3ch1nd2017*!@144.126.154.99:5432/novalink"
+CLOUD_DB_HOST = "144.126.154.99"
+CLOUD_DB_PORT = "5432"
+CLOUD_DB_USER = "techind"
+CLOUD_DB_PASS = "pgT3ch1nd2017*!"
+CLOUD_BASE_URL = f"postgresql://{CLOUD_DB_USER}:{CLOUD_DB_PASS}@{CLOUD_DB_HOST}:{CLOUD_DB_PORT}/serviciosdev"
 
 
 class DatabaseState(rx.State):
@@ -16,6 +21,27 @@ class DatabaseState(rx.State):
         """Check if database connection is available."""
         return True
 
+    def _get_base_url(self) -> str:
+        """Get the base database URL, prioritizing local environment variables."""
+        local_url = os.getenv("REFLEX_DB_URL")
+        if local_url:
+            return local_url
+        return CLOUD_BASE_URL
+
+    def _construct_db_url(self, base_url: str, target_db_name: str) -> str:
+        """Construct a database URL for a specific database based on a base URL."""
+        try:
+            parsed = urlparse(base_url)
+            new_path = f"/{target_db_name}"
+            new_url = parsed._replace(path=new_path)
+            return urlunparse(new_url)
+        except Exception as e:
+            logging.exception(f"Error constructing DB URL for {target_db_name}: {e}")
+            if "/" in base_url.split("://")[1]:
+                base_parts = base_url.rsplit("/", 1)
+                return f"{base_parts[0]}/{target_db_name}"
+            return f"{base_url}/{target_db_name}"
+
     def _get_db_engine(self, db_name: str):
         """Get or create a database engine for the specified database name."""
         global _engines_cache
@@ -23,34 +49,35 @@ class DatabaseState(rx.State):
             db_name = "novalink"
         if db_name in _engines_cache:
             return _engines_cache[db_name]
+        base_url = self._get_base_url()
+        is_local = "localhost" in base_url or "127.0.0.1" in base_url
+        if is_local:
+            logging.info(
+                f"Ἶ Conectando a base de datos LOCAL ({db_name}): {urlparse(base_url).hostname}"
+            )
+        else:
+            logging.info(
+                f"☁️ Conectando a base de datos EN LA NUBE ({db_name}): {urlparse(base_url).hostname}"
+            )
         url = None
         if db_name == "novalink":
-            logging.warning("🧪 INITIALIZING CONNECTION TO NOVALINK TEST DATABASE")
-            logging.info("🔌 Switching to NOVALINK (Test Database) environment")
-            url = NOVALINK_DB_URL
-        else:
-            base_url = os.getenv("REFLEX_DB_URL")
-            if not base_url:
-                base_url = "postgresql://techind:pgT3ch1nd2017*!@144.126.154.99:5432/serviciosdev"
-            if db_name != "serviciosdev":
-                if "/serviciosdev" in base_url:
-                    url = base_url.replace("/serviciosdev", f"/{db_name}")
-                else:
-                    url_parts = base_url.rsplit("/", 1)
-                    if len(url_parts) == 2:
-                        url = f"{url_parts[0]}/{db_name}"
-                    else:
-                        logging.error(
-                            f"Cannot parse base URL to switch database: {base_url}"
-                        )
-                        return None
+            env_novalink = os.getenv("NOVALINK_DB_URL")
+            if env_novalink:
+                url = env_novalink
+                logging.info("⚡ Using explicit NOVALINK_DB_URL from environment")
             else:
-                url = base_url
+                url = self._construct_db_url(base_url, "novalink")
+        elif db_name == "serviciosdev":
+            url = self._construct_db_url(base_url, "serviciosdev")
+        else:
+            url = self._construct_db_url(base_url, db_name)
         if not url:
-            logging.error(f"No connection URL found for database: {db_name}")
+            logging.error(f"No connection URL constructed for database: {db_name}")
             return None
         try:
-            logging.info(f"Creating new database engine for: {db_name}")
+            logging.debug(
+                f"Creating new database engine for: {db_name} -> {url.split('@')[-1]}"
+            )
             engine = create_engine(
                 url,
                 pool_pre_ping=True,
@@ -66,10 +93,7 @@ class DatabaseState(rx.State):
                 },
             )
             _engines_cache[db_name] = engine
-            if db_name == "novalink":
-                logging.warning(
-                    f"✅ Successfully established connection to NOVALINK test database"
-                )
+            logging.info(f"✅ Engine created for {db_name}")
             return engine
         except Exception as e:
             logging.exception(f"Error creating database engine for {db_name}: {e}")
