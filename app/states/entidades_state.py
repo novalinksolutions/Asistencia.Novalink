@@ -121,6 +121,8 @@ class EntidadesState(DatabaseState):
             self.selected_parent_nivel1 = parent_id_str
         elif self.selected_nivel == "grupos":
             self.selected_parent_nivel1 = parent_id_str
+        elif self.selected_nivel == "atributo":
+            self.selected_parent_nivel1 = parent_id_str
 
     @rx.event
     def cancel_edit(self):
@@ -171,6 +173,24 @@ class EntidadesState(DatabaseState):
             )
         try:
             create_query = """
+                CREATE TABLE IF NOT EXISTS public.atributotabularemp (
+                    codigo INTEGER PRIMARY KEY,
+                    descripcion TEXT,
+                    niveladm1 INTEGER,
+                    fechacreacion TIMESTAMP,
+                    usuario TEXT,
+                    activo BOOLEAN DEFAULT true
+                )
+            """
+            await self._execute_write(create_query, target_db=target_db)
+            query = "ALTER TABLE public.atributotabularemp ADD COLUMN IF NOT EXISTS activo BOOLEAN DEFAULT true"
+            await self._execute_write(query, target_db=target_db)
+        except Exception as e:
+            logging.exception(
+                f"Migration: Could not ensure atributotabularemp table/column: {e}"
+            )
+        try:
+            create_query = """
                 CREATE TABLE IF NOT EXISTS public.tipoempleado (
                     codigo INTEGER PRIMARY KEY,
                     descripcion TEXT,
@@ -202,7 +222,11 @@ class EntidadesState(DatabaseState):
         """Load items from the parent level table based on current selection."""
         parent_table = ""
         target_list = ""
-        if self.selected_nivel == "cargos" or self.selected_nivel == "grupos":
+        if (
+            self.selected_nivel == "cargos"
+            or self.selected_nivel == "grupos"
+            or self.selected_nivel == "atributo"
+        ):
             parent_table = "niveladm1"
             target_list = "nivel1"
         elif self.selected_nivel == "tipoempleado":
@@ -279,6 +303,19 @@ class EntidadesState(DatabaseState):
                     FROM public.tipoempleado 
                     ORDER BY descripcion ASC
                 """
+            elif self.selected_nivel == "atributo":
+                query = """
+                    SELECT 
+                        codigo,
+                        descripcion,
+                        COALESCE(to_char(fechacreacion, 'YYYY-MM-DD HH24:MI'), '') as fecha_creacion,
+                        COALESCE(usuario, '') as usuario,
+                        '' as cod_alterno,
+                        COALESCE(activo, true) as activo,
+                        COALESCE(niveladm1, 0) as parent_id
+                    FROM public.atributotabularemp 
+                    ORDER BY descripcion ASC
+                """
             else:
                 parent_col = ""
                 if self.selected_nivel == "2":
@@ -325,6 +362,15 @@ class EntidadesState(DatabaseState):
                     return rx.toast.error("Debe seleccionar el nivel superior.")
                 parent_updates["niveladm1"] = p_val
             elif self.selected_nivel == "grupos":
+                p_val = (
+                    int(self.selected_parent_nivel1)
+                    if self.selected_parent_nivel1
+                    else 0
+                )
+                if p_val == 0:
+                    return rx.toast.error("Debe seleccionar el nivel superior.")
+                parent_updates["niveladm1"] = p_val
+            elif self.selected_nivel == "atributo":
                 p_val = (
                     int(self.selected_parent_nivel1)
                     if self.selected_parent_nivel1
@@ -513,6 +559,48 @@ class EntidadesState(DatabaseState):
                         },
                     )
                     rx.toast.success("Tipo de empleado actualizado correctamente.")
+            elif self.selected_nivel == "atributo":
+                if self.selected_item["codigo"] == 0:
+                    next_id_res = await self._execute_query(
+                        "SELECT COALESCE(MAX(codigo), 0) + 1 as next_id FROM public.atributotabularemp"
+                    )
+                    next_id = next_id_res[0]["next_id"] if next_id_res else 1
+                    query = """
+                        INSERT INTO public.atributotabularemp 
+                        (codigo, descripcion, niveladm1, fechacreacion, usuario, activo)
+                        VALUES (:id, :desc, :p_id, NOW(), :user, :active)
+                    """
+                    await self._execute_write(
+                        query,
+                        {
+                            "id": next_id,
+                            "desc": self.selected_item["descripcion"],
+                            "p_id": parent_updates["niveladm1"],
+                            "user": current_user,
+                            "active": self.selected_item["activo"],
+                        },
+                    )
+                    rx.toast.success("Registro adicional creado correctamente.")
+                else:
+                    query = """
+                        UPDATE public.atributotabularemp 
+                        SET descripcion = :desc, 
+                            niveladm1 = :p_id, 
+                            usuario = :user, 
+                            activo = :active
+                        WHERE codigo = :id
+                    """
+                    await self._execute_write(
+                        query,
+                        {
+                            "id": self.selected_item["codigo"],
+                            "desc": self.selected_item["descripcion"],
+                            "p_id": parent_updates["niveladm1"],
+                            "user": current_user,
+                            "active": self.selected_item["activo"],
+                        },
+                    )
+                    rx.toast.success("Registro adicional actualizado correctamente.")
             elif self.selected_item["codigo"] == 0:
                 next_id_res = await self._execute_query(
                     f"SELECT COALESCE(MAX(codigo), 0) + 1 as next_id FROM public.{self.table_name}"
@@ -565,7 +653,7 @@ class EntidadesState(DatabaseState):
             ]
             return
         try:
-            query = "SELECT codigo, valor FROM public.parametros WHERE codigo IN (4, 5, 8, 11, 14, 17)"
+            query = "SELECT codigo, valor FROM public.parametros WHERE codigo IN (4, 5, 8, 11, 14, 17, 35, 36)"
             results = await self._execute_query(query, target_db="novalink")
             params = {row["codigo"]: row["valor"] for row in results}
             count = int(params.get(4, "5"))
@@ -578,6 +666,9 @@ class EntidadesState(DatabaseState):
             configs.append({"id": "cargos", "label": "Cargos"})
             configs.append({"id": "grupos", "label": "Grupos"})
             configs.append({"id": "tipoempleado", "label": "Tipo Empleado"})
+            if params.get(35, "0") == "1":
+                label_attr = params.get(36, "Atributo Adicional")
+                configs.append({"id": "atributo", "label": label_attr})
             self.niveles_config = configs
             try:
                 available_ids = [c["id"] for c in configs]
@@ -602,6 +693,8 @@ class EntidadesState(DatabaseState):
             self.table_name = "grupos"
         elif value == "tipoempleado":
             self.table_name = "tipoempleado"
+        elif value == "atributo":
+            self.table_name = "atributotabularemp"
         else:
             self.table_name = f"niveladm{value}"
         self.cancel_edit()
