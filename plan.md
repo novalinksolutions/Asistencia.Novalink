@@ -1,44 +1,47 @@
-# Plan: Sistema de Sesiones Robusto ✅
+# Plan de Implementación: Módulo Equipos ✅
 
-## Phase 1: Implementar Session Token y Persistencia ✅
-- [x] Crear token de sesión único por login
-- [x] Almacenar token en cookies del navegador
-- [x] Agregar tiempo de expiración de sesión (inactividad)
-- [x] Tabla de sesiones en base de datos para tracking
-- [x] Validar token en cada carga de página
-
-## Phase 2: Protección de Rutas y Middleware ✅
-- [x] Crear AuthMiddleware para validar sesión activa
-- [x] Proteger todas las rutas internas (requieren autenticación)
-- [x] Redirect automático a /login si sesión inválida
-- [x] Agregar verificación de sesión en BaseState.on_load
-- [x] Limpiar tokens expirados de la base de datos
-
-## Phase 3: Mejoras de Seguridad y UX ✅
-- [x] Renovar token automáticamente con actividad del usuario
-- [x] Mostrar modal de "sesión expirada" antes de redirect
-- [x] Logout automático por inactividad (30 min)
-- [x] Prevenir múltiples sesiones simultáneas (opcional)
-- [x] Logs de auditoría de inicio/cierre de sesión
+## Objetivo
+Crear un nuevo módulo llamado "Equipos" bajo "Seguridad" con dos submenús:
+- **Conectividad**: Gestión de dispositivos (codigo, descripcion, activo, en_linea)
+- **Transacciones**: Vista de transacciones con filtros (dispositivo, fechahora, mensaje)
 
 ---
 
-## Resumen de Implementación Completada
+## Fase 1: Estructura Base y Navegación ✅
+- [x] Actualizar `BaseState.navigation_menu` para agregar "Equipos" bajo "Seguridad"
+- [x] Agregar "Conectividad" y "Transacciones" como submenús de "Equipos"
+- [x] Crear archivo `app/pages/conectividad.py` con página base
+- [x] Crear archivo `app/pages/transacciones.py` con página base
+- [x] Crear archivo `app/states/conectividad_state.py` con lógica básica
+- [x] Crear archivo `app/states/transacciones_state.py` con lógica básica
+- [x] Registrar rutas en `app/app.py` y actualizar `set_active_page` en `BaseState`
 
-### 🔐 **Autenticación y Sesiones**
-- Token seguro UUID almacenado en cookies httpOnly
-- Tabla `public.sesiones` para tracking completo
-- Expiración automática por inactividad (30 minutos)
-- Renovación automática con cada interacción
+---
 
-### 🛡️ **Protección de Rutas**
-- Middleware en BaseState.check_login()
-- Validación automática en todas las páginas internas
-- Redirect a /login si sesión inválida
-- Re-hidratación de datos de usuario desde sesión
+## Fase 2: Implementar Conectividad (Dispositivos) ✅
+- [x] Crear migración de tabla `dispositivos` con columnas: codigo, descripcion, activo, en_linea
+- [x] Implementar carga de datos de dispositivos en `ConectividadState`
+- [x] Crear UI con DataTable mostrando: codigo, descripcion, activo, en_linea
+- [x] Implementar CRUD completo (crear, editar, eliminar, activar/desactivar)
+- [x] Agregar diálogo de creación/edición con validación de campos
+- [x] Implementar búsqueda y filtros (activos/inactivos, en línea/fuera de línea)
 
-### 📊 **Auditoría y Seguridad**
-- Logs de inicio/cierre de sesión
-- Registro de IP address y User Agent
-- Limpieza automática de sesiones expiradas
-- Estado completamente limpio en logout
+---
+
+## Fase 3: Implementar Transacciones con Filtros y Paginación ✅
+- [x] Crear migración de tabla `transacciones` con columnas: id, dispositivo_id, fechahora, mensaje
+- [x] Implementar carga de transacciones filtradas por fecha actual en `TransaccionesState`
+- [x] Crear UI con DataTable mostrando: dispositivo, fechahora, mensaje
+- [x] Implementar ComboBox de filtro por dispositivo
+- [x] Implementar paginación con máximo 15 registros por página
+- [x] Agregar controles de navegación (anterior/siguiente, número de página)
+- [x] Implementar filtro automático para mostrar solo registros del día actual
+- [x] Agregar refresco automático de datos cada 30 segundos
+
+---
+
+## Fase 4: Verificación UI ✅
+- [x] Verificar navegación al módulo "Equipos" y acceso a "Conectividad"
+- [x] Probar apertura del diálogo de crear/editar dispositivo en Conectividad
+- [x] Verificar tabla de Transacciones con estructura correcta (dispositivo, fechahora, mensaje)
+- [x] Confirmar controles de paginación en Transacciones (anterior/siguiente, contador de página)

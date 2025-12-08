@@ -13,6 +13,8 @@ from app.pages.catalogo_nivel4 import catalogo_nivel4_page
 from app.pages.catalogo_nivel5 import catalogo_nivel5_page
 from app.pages.entidades import entidades_page
 from app.pages.empleados import empleados_page
+from app.pages.conectividad import conectividad_page
+from app.pages.transacciones import transacciones_page
 from app.pages.login import login_page
 from app.states.login_state import LoginState
 from app.utils.assets import ensure_assets
@@ -34,6 +36,8 @@ def dashboard() -> rx.Component:
             ("Nivel 5", catalogo_nivel5_page()),
             ("Entidades", entidades_page()),
             ("Empleados", empleados_page()),
+            ("Conectividad", conectividad_page()),
+            ("Transacciones", transacciones_page()),
             rx.el.div(
                 rx.el.h2(
                     "Bienvenido al Panel de Administración",

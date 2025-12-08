@@ -27,6 +27,7 @@ class BaseState(DatabaseState):
     expanded_modules: dict[str, bool] = {
         "Parametros": True,
         "Seguridad": False,
+        "Equipos": False,
         "Catálogos": False,
         "Asistencias": False,
     }
@@ -48,6 +49,14 @@ class BaseState(DatabaseState):
             sub_items=[
                 NavItem(name="Usuarios", icon="users"),
                 NavItem(name="Roles", icon="shield"),
+            ],
+        ),
+        NavItem(
+            name="Equipos",
+            icon="monitor-smartphone",
+            sub_items=[
+                NavItem(name="Conectividad", icon="wifi"),
+                NavItem(name="Transacciones", icon="arrow-left-right"),
             ],
         ),
         NavItem(
@@ -103,6 +112,16 @@ class BaseState(DatabaseState):
             await state.on_load()
         elif page == "Empleados":
             pass
+        elif page == "Conectividad":
+            from app.states.conectividad_state import ConectividadState
+
+            state = await self.get_state(ConectividadState)
+            await state.on_load()
+        elif page == "Transacciones":
+            from app.states.transacciones_state import TransaccionesState
+
+            state = await self.get_state(TransaccionesState)
+            await state.on_load()
 
     @rx.event
     def toggle_module(self, module_name: str):
