@@ -111,7 +111,10 @@ class BaseState(DatabaseState):
             state = await self.get_state(EntidadesState)
             await state.on_load()
         elif page == "Empleados":
-            pass
+            from app.states.empleados_state import EmpleadosState
+
+            state = await self.get_state(EmpleadosState)
+            await state.on_load()
         elif page == "Conectividad":
             from app.states.conectividad_state import ConectividadState
 
