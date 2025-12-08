@@ -183,6 +183,8 @@ class EntidadesState(DatabaseState):
                 )
             """
             await self._execute_write(create_query, target_db=target_db)
+            query_nivel = "ALTER TABLE public.atributotabularemp ADD COLUMN IF NOT EXISTS niveladm1 INTEGER"
+            await self._execute_write(query_nivel, target_db=target_db)
             query = "ALTER TABLE public.atributotabularemp ADD COLUMN IF NOT EXISTS activo BOOLEAN DEFAULT true"
             await self._execute_write(query, target_db=target_db)
         except Exception as e:
