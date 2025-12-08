@@ -6,26 +6,26 @@ from app.states.database_state import DatabaseState
 
 
 class Employee(TypedDict):
-    codigo: int
+    id: int
     cedula: str
     nombres: str
     apellidos: str
     correoelectronico: str
     ganarecargonocturno: bool
     ganasobretiempo: bool
-    autsobretiempo: bool
-    recargoextdlibres: bool
-    appmovil: bool
+    stconautorizacion: bool
+    ganarecargodialibre: bool
+    offline: bool
     niveladm1: int
     niveladm2: int
     niveladm3: int
     niveladm4: int
     niveladm5: int
-    codigocargo: int
-    codigotipoempleado: int
-    codatributotabular: int
+    cargo: int
+    tipo: int
+    atributotabular: int
     atributotexto: str
-    web: bool
+    accesoweb: bool
     pwd: str
     activo: bool
 
@@ -38,26 +38,26 @@ class CatalogItem(TypedDict):
 class EmpleadosState(DatabaseState):
     employees: list[Employee] = []
     selected_employee: Employee = {
-        "codigo": 0,
+        "id": 0,
         "cedula": "",
         "nombres": "",
         "apellidos": "",
         "correoelectronico": "",
         "ganarecargonocturno": False,
         "ganasobretiempo": False,
-        "autsobretiempo": False,
-        "recargoextdlibres": False,
-        "appmovil": False,
+        "stconautorizacion": False,
+        "ganarecargodialibre": False,
+        "offline": False,
         "niveladm1": 0,
         "niveladm2": 0,
         "niveladm3": 0,
         "niveladm4": 0,
         "niveladm5": 0,
-        "codigocargo": 0,
-        "codigotipoempleado": 0,
-        "codatributotabular": 0,
+        "cargo": 0,
+        "tipo": 0,
+        "atributotabular": 0,
         "atributotexto": "",
-        "web": False,
+        "accesoweb": False,
         "pwd": "12345678",
         "activo": True,
     }
@@ -104,14 +104,12 @@ class EmpleadosState(DatabaseState):
     @rx.var
     def form_title(self) -> str:
         return (
-            "Editar Empleado"
-            if self.selected_employee["codigo"] != 0
-            else "Nuevo Empleado"
+            "Editar Empleado" if self.selected_employee["id"] != 0 else "Nuevo Empleado"
         )
 
     @rx.var
     def is_pwd_enabled(self) -> bool:
-        return self.selected_employee["web"]
+        return self.selected_employee["accesoweb"]
 
     @rx.event
     def set_search_query(self, value: str):
@@ -139,26 +137,26 @@ class EmpleadosState(DatabaseState):
     @rx.event
     def new_employee(self):
         self.selected_employee = {
-            "codigo": 0,
+            "id": 0,
             "cedula": "",
             "nombres": "",
             "apellidos": "",
             "correoelectronico": "",
             "ganarecargonocturno": False,
             "ganasobretiempo": False,
-            "autsobretiempo": False,
-            "recargoextdlibres": False,
-            "appmovil": False,
+            "stconautorizacion": False,
+            "ganarecargodialibre": False,
+            "offline": False,
             "niveladm1": 0,
             "niveladm2": 0,
             "niveladm3": 0,
             "niveladm4": 0,
             "niveladm5": 0,
-            "codigocargo": 0,
-            "codigotipoempleado": 0,
-            "codatributotabular": 0,
+            "cargo": 0,
+            "tipo": 0,
+            "atributotabular": 0,
             "atributotexto": "",
-            "web": False,
+            "accesoweb": False,
             "pwd": "12345678",
             "activo": True,
         }
@@ -180,32 +178,32 @@ class EmpleadosState(DatabaseState):
         try:
             query = """
                 CREATE TABLE IF NOT EXISTS public.empleados (
-                    codigo INTEGER PRIMARY KEY,
-                    cedula TEXT,
-                    apellidos TEXT,
-                    nombres TEXT,
-                    correoelectronico TEXT,
+                    id BIGINT PRIMARY KEY,
+                    cedula VARCHAR(20),
+                    apellidos VARCHAR(50),
+                    nombres VARCHAR(50),
+                    correoelectronico VARCHAR(50),
                     ganarecargonocturno BOOLEAN DEFAULT false,
                     ganasobretiempo BOOLEAN DEFAULT false,
-                    autsobretiempo BOOLEAN DEFAULT false,
-                    recargoextdlibres BOOLEAN DEFAULT false,
-                    appmovil BOOLEAN DEFAULT false,
-                    niveladm1 INTEGER DEFAULT 0,
-                    niveladm2 INTEGER DEFAULT 0,
-                    niveladm3 INTEGER DEFAULT 0,
-                    niveladm4 INTEGER DEFAULT 0,
-                    niveladm5 INTEGER DEFAULT 0,
-                    codigocargo INTEGER DEFAULT 0,
-                    codigotipoempleado INTEGER DEFAULT 0,
-                    codatributotabular INTEGER DEFAULT 0,
-                    atributotexto TEXT,
-                    web BOOLEAN DEFAULT false,
+                    stconautorizacion BOOLEAN DEFAULT false,
+                    ganarecargodialibre BOOLEAN DEFAULT false,
+                    offline BOOLEAN DEFAULT false,
+                    niveladm1 BIGINT DEFAULT 0,
+                    niveladm2 BIGINT DEFAULT 0,
+                    niveladm3 BIGINT DEFAULT 0,
+                    niveladm4 BIGINT DEFAULT 0,
+                    niveladm5 BIGINT DEFAULT 0,
+                    cargo BIGINT DEFAULT 0,
+                    tipo BIGINT DEFAULT 0,
+                    atributotabular BIGINT DEFAULT 0,
+                    atributotexto VARCHAR(10),
+                    accesoweb BOOLEAN DEFAULT false,
                     pwd TEXT,
                     activo BOOLEAN DEFAULT true,
                     fechacreacion TIMESTAMP DEFAULT NOW(),
-                    usuariocrea TEXT,
+                    usuariocrea BIGINT,
                     fechamodificacion TIMESTAMP,
-                    usuariomodifica TEXT
+                    usuariomodifica BIGINT
                 )
             """
             await self._execute_write(query, target_db="novalink")
@@ -270,38 +268,38 @@ class EmpleadosState(DatabaseState):
         try:
             query = """
                 SELECT 
-                    codigo, cedula, nombres, apellidos, correoelectronico,
-                    ganarecargonocturno, ganasobretiempo, autsobretiempo,
-                    recargoextdlibres, appmovil,
+                    id, cedula, nombres, apellidos, correoelectronico,
+                    ganarecargonocturno, ganasobretiempo, stconautorizacion,
+                    ganarecargodialibre, offline,
                     niveladm1, niveladm2, niveladm3, niveladm4, niveladm5,
-                    codigocargo, codigotipoempleado, codatributotabular, atributotexto,
-                    web, pwd, activo
+                    cargo, tipo, atributotabular, atributotexto,
+                    accesoweb, pwd, activo
                 FROM public.empleados
                 ORDER BY apellidos, nombres
             """
             results = await self._execute_query(query, target_db="novalink")
             self.employees = [
                 Employee(
-                    codigo=row["codigo"],
+                    id=row["id"],
                     cedula=row["cedula"] or "",
                     nombres=row["nombres"] or "",
                     apellidos=row["apellidos"] or "",
                     correoelectronico=row["correoelectronico"] or "",
                     ganarecargonocturno=bool(row["ganarecargonocturno"]),
                     ganasobretiempo=bool(row["ganasobretiempo"]),
-                    autsobretiempo=bool(row["autsobretiempo"]),
-                    recargoextdlibres=bool(row["recargoextdlibres"]),
-                    appmovil=bool(row["appmovil"]),
+                    stconautorizacion=bool(row["stconautorizacion"]),
+                    ganarecargodialibre=bool(row["ganarecargodialibre"]),
+                    offline=bool(row["offline"]),
                     niveladm1=row["niveladm1"] or 0,
                     niveladm2=row["niveladm2"] or 0,
                     niveladm3=row["niveladm3"] or 0,
                     niveladm4=row["niveladm4"] or 0,
                     niveladm5=row["niveladm5"] or 0,
-                    codigocargo=row["codigocargo"] or 0,
-                    codigotipoempleado=row["codigotipoempleado"] or 0,
-                    codatributotabular=row["codatributotabular"] or 0,
+                    cargo=row["cargo"] or 0,
+                    tipo=row["tipo"] or 0,
+                    atributotabular=row["atributotabular"] or 0,
                     atributotexto=row["atributotexto"] or "",
-                    web=bool(row["web"]),
+                    accesoweb=bool(row["accesoweb"]),
                     pwd=row["pwd"] or "",
                     activo=bool(row["activo"]),
                 )
@@ -319,30 +317,30 @@ class EmpleadosState(DatabaseState):
         from app.states.base_state import BaseState
 
         base_state = await self.get_state(BaseState)
-        user = base_state.logged_user_name or "system"
+        user_id = base_state.logged_user_id or 1
         pwd_val = emp["pwd"]
         if len(pwd_val) != 64:
             pwd_val = hashlib.sha256(pwd_val.encode()).hexdigest()
         try:
-            if emp["codigo"] == 0:
+            if emp["id"] == 0:
                 next_id_res = await self._execute_query(
-                    "SELECT COALESCE(MAX(codigo), 0) + 1 as next_id FROM public.empleados",
+                    "SELECT COALESCE(MAX(id), 0) + 1 as next_id FROM public.empleados",
                     target_db="novalink",
                 )
                 next_id = next_id_res[0]["next_id"] if next_id_res else 1
                 query = """
                     INSERT INTO public.empleados (
-                        codigo, cedula, nombres, apellidos, correoelectronico,
-                        ganarecargonocturno, ganasobretiempo, autsobretiempo, recargoextdlibres, appmovil,
+                        id, cedula, nombres, apellidos, correoelectronico,
+                        ganarecargonocturno, ganasobretiempo, stconautorizacion, ganarecargodialibre, offline,
                         niveladm1, niveladm2, niveladm3, niveladm4, niveladm5,
-                        codigocargo, codigotipoempleado, codatributotabular, atributotexto,
-                        web, pwd, activo, fechacreacion, usuariocrea
+                        cargo, tipo, atributotabular, atributotexto,
+                        accesoweb, pwd, activo, fechacreacion, usuariocrea
                     ) VALUES (
                         :id, :cedula, :nombres, :apellidos, :email,
                         :grn, :gst, :ast, :rel, :app,
                         :n1, :n2, :n3, :n4, :n5,
                         :cc, :cte, :cat, :atxt,
-                        :web, :pwd, :activo, NOW(), :user
+                        :web, :pwd, :activo, NOW(), :uid
                     )
                 """
                 params = {
@@ -353,22 +351,22 @@ class EmpleadosState(DatabaseState):
                     "email": emp["correoelectronico"],
                     "grn": emp["ganarecargonocturno"],
                     "gst": emp["ganasobretiempo"],
-                    "ast": emp["autsobretiempo"],
-                    "rel": emp["recargoextdlibres"],
-                    "app": emp["appmovil"],
+                    "ast": emp["stconautorizacion"],
+                    "rel": emp["ganarecargodialibre"],
+                    "app": emp["offline"],
                     "n1": emp["niveladm1"],
                     "n2": emp["niveladm2"],
                     "n3": emp["niveladm3"],
                     "n4": emp["niveladm4"],
                     "n5": emp["niveladm5"],
-                    "cc": emp["codigocargo"],
-                    "cte": emp["codigotipoempleado"],
-                    "cat": emp["codatributotabular"],
+                    "cc": emp["cargo"],
+                    "cte": emp["tipo"],
+                    "cat": emp["atributotabular"],
                     "atxt": emp["atributotexto"],
-                    "web": emp["web"],
+                    "web": emp["accesoweb"],
                     "pwd": pwd_val,
                     "activo": emp["activo"],
-                    "user": user,
+                    "uid": user_id,
                 }
                 await self._execute_write(query, params, target_db="novalink")
                 rx.toast.success("Empleado creado correctamente")
@@ -376,36 +374,36 @@ class EmpleadosState(DatabaseState):
                 query = """
                     UPDATE public.empleados SET
                         cedula = :cedula, nombres = :nombres, apellidos = :apellidos, correoelectronico = :email,
-                        ganarecargonocturno = :grn, ganasobretiempo = :gst, autsobretiempo = :ast, recargoextdlibres = :rel, appmovil = :app,
+                        ganarecargonocturno = :grn, ganasobretiempo = :gst, stconautorizacion = :ast, ganarecargodialibre = :rel, offline = :app,
                         niveladm1 = :n1, niveladm2 = :n2, niveladm3 = :n3, niveladm4 = :n4, niveladm5 = :n5,
-                        codigocargo = :cc, codigotipoempleado = :cte, codatributotabular = :cat, atributotexto = :atxt,
-                        web = :web, pwd = :pwd, activo = :activo, fechamodificacion = NOW(), usuariomodifica = :user
-                    WHERE codigo = :id
+                        cargo = :cc, tipo = :cte, atributotabular = :cat, atributotexto = :atxt,
+                        accesoweb = :web, pwd = :pwd, activo = :activo, fechamodificacion = NOW(), usuariomodifica = :uid
+                    WHERE id = :id
                 """
                 params = {
-                    "id": emp["codigo"],
+                    "id": emp["id"],
                     "cedula": emp["cedula"],
                     "nombres": emp["nombres"],
                     "apellidos": emp["apellidos"],
                     "email": emp["correoelectronico"],
                     "grn": emp["ganarecargonocturno"],
                     "gst": emp["ganasobretiempo"],
-                    "ast": emp["autsobretiempo"],
-                    "rel": emp["recargoextdlibres"],
-                    "app": emp["appmovil"],
+                    "ast": emp["stconautorizacion"],
+                    "rel": emp["ganarecargodialibre"],
+                    "app": emp["offline"],
                     "n1": emp["niveladm1"],
                     "n2": emp["niveladm2"],
                     "n3": emp["niveladm3"],
                     "n4": emp["niveladm4"],
                     "n5": emp["niveladm5"],
-                    "cc": emp["codigocargo"],
-                    "cte": emp["codigotipoempleado"],
-                    "cat": emp["codatributotabular"],
+                    "cc": emp["cargo"],
+                    "cte": emp["tipo"],
+                    "cat": emp["atributotabular"],
                     "atxt": emp["atributotexto"],
-                    "web": emp["web"],
+                    "web": emp["accesoweb"],
                     "pwd": pwd_val,
                     "activo": emp["activo"],
-                    "user": user,
+                    "uid": user_id,
                 }
                 await self._execute_write(query, params, target_db="novalink")
                 rx.toast.success("Empleado actualizado correctamente")

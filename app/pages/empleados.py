@@ -3,7 +3,7 @@ from app.states.empleados_state import EmpleadosState, Employee
 
 
 def employee_list_item(emp: Employee) -> rx.Component:
-    is_selected = EmpleadosState.selected_employee["codigo"] == emp["codigo"]
+    is_selected = EmpleadosState.selected_employee["id"] == emp["id"]
     return rx.el.div(
         rx.el.div(
             rx.el.p(
@@ -95,7 +95,7 @@ def form_select(
 def tab_datos_basicos() -> rx.Component:
     return rx.el.div(
         rx.el.div(
-            form_input("ID", "codigo", read_only=True),
+            form_input("ID", "id", read_only=True),
             form_input("Cédula", "cedula", placeholder="0000000000"),
             class_name="grid grid-cols-2 gap-4 mb-4",
         ),
@@ -119,12 +119,13 @@ def tab_datos_basicos() -> rx.Component:
                 form_checkbox("Gana recargo nocturno", "ganarecargonocturno"),
                 form_checkbox("Gana sobretiempo", "ganasobretiempo"),
                 form_checkbox(
-                    "El sobretiempo necesita ser autorizado", "autsobretiempo"
+                    "El sobretiempo necesita ser autorizado", "stconautorizacion"
                 ),
                 form_checkbox(
-                    "Aplica recargo ext. si trabaja en días libres", "recargoextdlibres"
+                    "Aplica recargo ext. si trabaja en días libres",
+                    "ganarecargodialibre",
                 ),
-                form_checkbox("Aplicación Móvil (Offline)", "appmovil"),
+                form_checkbox("Aplicación Móvil (Offline)", "offline"),
                 class_name="grid grid-cols-1 md:grid-cols-2 gap-2",
             ),
             class_name="bg-gray-50 p-4 rounded-xl border border-gray-100 mt-4",
@@ -191,15 +192,13 @@ def tab_organizacional() -> rx.Component:
                 class_name="text-sm font-semibold text-gray-900 mb-3",
             ),
             rx.el.div(
-                form_select("Cargo", "codigocargo", EmpleadosState.cat_cargos),
-                form_select(
-                    "Tipo de Empleado", "codigotipoempleado", EmpleadosState.cat_tipos
-                ),
+                form_select("Cargo", "cargo", EmpleadosState.cat_cargos),
+                form_select("Tipo de Empleado", "tipo", EmpleadosState.cat_tipos),
                 rx.cond(
                     EmpleadosState.has_attr_tabular,
                     form_select(
                         EmpleadosState.label_attr_tabular,
-                        "codatributotabular",
+                        "atributotabular",
                         EmpleadosState.cat_attr_tabular,
                     ),
                 ),
@@ -231,8 +230,10 @@ def tab_permisos() -> rx.Component:
                 rx.el.label(
                     rx.el.input(
                         type="checkbox",
-                        checked=EmpleadosState.selected_employee["web"],
-                        on_change=lambda v: EmpleadosState.toggle_bool_field("web", v),
+                        checked=EmpleadosState.selected_employee["accesoweb"],
+                        on_change=lambda v: EmpleadosState.toggle_bool_field(
+                            "accesoweb", v
+                        ),
                         class_name="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500",
                     ),
                     rx.el.span(
@@ -352,7 +353,7 @@ def form_section() -> rx.Component:
             class_name="mt-6 pt-4 border-t border-gray-100",
         ),
         class_name="bg-white p-6 rounded-xl shadow-sm border h-full flex flex-col",
-        key=EmpleadosState.selected_employee["codigo"],
+        key=EmpleadosState.selected_employee["id"],
     )
 
 
