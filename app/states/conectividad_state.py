@@ -26,37 +26,22 @@ class ConectividadState(DatabaseState):
     async def on_load(self):
         """Load connectivity data on page load."""
         logging.info("🔄 Loading Conectividad page...")
-        await self._ensure_table()
         await self.load_dispositivos()
-
-    async def _ensure_table(self):
-        """Ensure the dispositivos table exists."""
-        query = """
-            CREATE TABLE IF NOT EXISTS public.dispositivos (
-                id SERIAL PRIMARY KEY,
-                codigo VARCHAR(50) UNIQUE NOT NULL,
-                descripcion VARCHAR(255),
-                activo BOOLEAN DEFAULT true,
-                en_linea BOOLEAN DEFAULT false,
-                fecha_registro TIMESTAMP DEFAULT NOW()
-            );
-        """
-        await self._execute_write(query, target_db="novalink")
 
     @rx.event
     async def load_dispositivos(self):
         """Fetch all devices from the database."""
         self.is_loading = True
         try:
-            query = "SELECT id, codigo, descripcion, activo, en_linea FROM public.dispositivos ORDER BY codigo"
+            query = "SELECT codigo, descripcion, activo, enlinea FROM public.dispositivos ORDER BY codigo"
             results = await self._execute_query(query, target_db="novalink")
             self.dispositivos = [
                 Dispositivo(
-                    id=row["id"],
-                    codigo=row["codigo"],
-                    descripcion=row["descripcion"],
+                    id=int(row["codigo"]),
+                    codigo=str(row["codigo"]),
+                    descripcion=row["descripcion"] or "",
                     activo=bool(row["activo"]),
-                    en_linea=bool(row["en_linea"]),
+                    en_linea=bool(row["enlinea"]),
                 )
                 for row in results
             ]
@@ -98,16 +83,23 @@ class ConectividadState(DatabaseState):
     @rx.event
     async def save_dispositivo(self):
         """Save or update the device."""
-        code = self.current_dispositivo.get("codigo", "").strip()
+        code_str = str(self.current_dispositivo.get("codigo", "")).strip()
         desc = self.current_dispositivo.get("descripcion", "").strip()
-        if not code or not desc:
+        if not code_str or not desc:
             self.error_message = "Código y descripción son obligatorios."
             return
         try:
-            if self.current_dispositivo.get("id", 0) == 0:
+            code = int(code_str)
+        except ValueError as e:
+            logging.exception(f"Error converting code to int: {e}")
+            self.error_message = "El código debe ser numérico."
+            return
+        try:
+            original_pk = self.current_dispositivo.get("id", 0)
+            if original_pk == 0:
                 query = """
-                    INSERT INTO public.dispositivos (codigo, descripcion, activo, en_linea)
-                    VALUES (:codigo, :descripcion, :activo, :en_linea)
+                    INSERT INTO public.dispositivos (codigo, descripcion, activo, enlinea)
+                    VALUES (:codigo, :descripcion, :activo, :enlinea)
                 """
                 await self._execute_write(
                     query,
@@ -115,24 +107,24 @@ class ConectividadState(DatabaseState):
                         "codigo": code,
                         "descripcion": desc,
                         "activo": self.current_dispositivo.get("activo", True),
-                        "en_linea": self.current_dispositivo.get("en_linea", False),
+                        "enlinea": self.current_dispositivo.get("en_linea", False),
                     },
                     target_db="novalink",
                 )
             else:
                 query = """
                     UPDATE public.dispositivos
-                    SET codigo = :codigo, descripcion = :descripcion, activo = :activo, en_linea = :en_linea
-                    WHERE id = :id
+                    SET codigo = :new_codigo, descripcion = :descripcion, activo = :activo, enlinea = :enlinea
+                    WHERE codigo = :original_pk
                 """
                 await self._execute_write(
                     query,
                     {
-                        "id": self.current_dispositivo["id"],
-                        "codigo": code,
+                        "original_pk": original_pk,
+                        "new_codigo": code,
                         "descripcion": desc,
                         "activo": self.current_dispositivo.get("activo", True),
-                        "en_linea": self.current_dispositivo.get("en_linea", False),
+                        "enlinea": self.current_dispositivo.get("en_linea", False),
                     },
                     target_db="novalink",
                 )

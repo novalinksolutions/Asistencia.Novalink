@@ -22,8 +22,7 @@ def transacciones_page() -> rx.Component:
         rx.el.div(
             rx.el.div(
                 rx.el.h2(
-                    "Registro de Transacciones",
-                    class_name="text-2xl font-bold text-gray-900",
+                    "REGISTRO DE TRANSACCIONES", class_name="text-2xl text-foreground"
                 ),
                 rx.el.button(
                     rx.icon("refresh-ccw", class_name="h-4 w-4 mr-2"),

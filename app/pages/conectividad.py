@@ -136,8 +136,8 @@ def conectividad_page() -> rx.Component:
         rx.el.div(
             rx.el.div(
                 rx.el.h2(
-                    "Gestión de Conectividad (Dispositivos)",
-                    class_name="text-2xl font-bold text-gray-900",
+                    "GESTIÓN DE CONECTIVIDAD (DISPOSITIVOS)",
+                    class_name="text-2xl text-foreground",
                 ),
                 rx.el.button(
                     rx.icon("plus", class_name="h-4 w-4 mr-2"),

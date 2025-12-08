@@ -57,7 +57,7 @@ class TransaccionesState(DatabaseState):
         query = """
             CREATE TABLE IF NOT EXISTS public.transacciones (
                 id SERIAL PRIMARY KEY,
-                dispositivo_id INTEGER REFERENCES public.dispositivos(id),
+                dispositivo_id BIGINT,
                 fechahora TIMESTAMP DEFAULT NOW(),
                 mensaje TEXT
             );
@@ -68,10 +68,10 @@ class TransaccionesState(DatabaseState):
     async def load_dispositivos_filter(self):
         """Load devices for the filter dropdown."""
         try:
-            query = "SELECT id, descripcion FROM public.dispositivos WHERE activo = true ORDER BY descripcion"
+            query = "SELECT codigo, descripcion FROM public.dispositivos WHERE activo = true ORDER BY descripcion"
             results = await self._execute_query(query, target_db="novalink")
             self.dispositivos_filter = [
-                DispositivoFilter(id=row["id"], descripcion=row["descripcion"])
+                DispositivoFilter(id=row["codigo"], descripcion=row["descripcion"])
                 for row in results
             ]
         except Exception as e:
@@ -94,7 +94,7 @@ class TransaccionesState(DatabaseState):
             )
             self.total_items = count_res[0]["count"] if count_res else 0
             offset = (self.current_page - 1) * self.items_per_page
-            query = f"\n                SELECT \n                    t.id, \n                    d.descripcion as dispositivo_desc, \n                    t.fechahora, \n                    t.mensaje\n                FROM public.transacciones t\n                LEFT JOIN public.dispositivos d ON t.dispositivo_id = d.id\n                WHERE {where_clause}\n                ORDER BY t.fechahora DESC\n                LIMIT :limit OFFSET :offset\n            "
+            query = f"\n                SELECT \n                    t.id, \n                    d.descripcion as dispositivo_desc, \n                    t.fechahora, \n                    t.mensaje\n                FROM public.transacciones t\n                LEFT JOIN public.dispositivos d ON t.dispositivo_id = d.codigo\n                WHERE {where_clause}\n                ORDER BY t.fechahora DESC\n                LIMIT :limit OFFSET :offset\n            "
             params["limit"] = self.items_per_page
             params["offset"] = offset
             results = await self._execute_query(query, params, target_db="novalink")
