@@ -84,6 +84,36 @@ class EmpleadosState(DatabaseState):
     has_attr_texto: bool = False
     label_attr_tabular: str = "Atributo Tabular"
     label_attr_texto: str = "Atributo Texto"
+    is_email_editable: bool = False
+
+    @rx.var
+    def masked_email(self) -> str:
+        email = self.selected_employee["correoelectronico"]
+        if not email or "@" not in email:
+            return email or ""
+        try:
+            user_part, domain_part = email.split("@", 1)
+            if len(user_part) > 4:
+                masked_user = user_part[:4] + "xxxx" + user_part[-1]
+            else:
+                masked_user = user_part
+            if "." in domain_part:
+                domain_host, domain_ext = domain_part.split(".", 1)
+                masked_domain = (
+                    domain_host[0] + "xxxx." + domain_ext
+                    if domain_host
+                    else domain_part
+                )
+            else:
+                masked_domain = domain_part
+            return f"{masked_user}@{masked_domain}"
+        except Exception as e:
+            logging.exception(f"Error masking email: {e}")
+            return email
+
+    @rx.event
+    def toggle_email_editable(self):
+        self.is_email_editable = not self.is_email_editable
 
     @rx.var
     def filtered_employees(self) -> list[Employee]:
@@ -166,10 +196,12 @@ class EmpleadosState(DatabaseState):
     def select_employee(self, employee: Employee):
         self.selected_employee = employee.copy()
         self.is_editing = True
+        self.is_email_editable = False
 
     @rx.event
     def cancel_edit(self):
         self.is_editing = False
+        self.is_email_editable = False
         self.new_employee()
 
     async def _ensure_tables(self):

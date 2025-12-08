@@ -104,11 +104,56 @@ def tab_datos_basicos() -> rx.Component:
             form_input("Apellidos", "apellidos", placeholder="Apellidos completos"),
             class_name="grid grid-cols-2 gap-4 mb-4",
         ),
-        form_input(
-            "Correo Electrónico",
-            "correoelectronico",
-            type_="email",
-            placeholder="ejemplo@correo.com",
+        rx.el.div(
+            rx.el.label(
+                "Correo Electrónico",
+                class_name="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1",
+            ),
+            rx.el.div(
+                rx.el.input(
+                    type="text",
+                    read_only=~EmpleadosState.is_email_editable,
+                    on_change=lambda v: EmpleadosState.set_field(
+                        "correoelectronico", v
+                    ),
+                    placeholder="ejemplo@correo.com",
+                    class_name=rx.cond(
+                        ~EmpleadosState.is_email_editable,
+                        "w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-gray-500 font-mono text-sm",
+                        "w-full px-3 py-2 border border-blue-300 bg-white rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-gray-900",
+                    ),
+                    default_value=rx.cond(
+                        EmpleadosState.is_email_editable,
+                        EmpleadosState.selected_employee["correoelectronico"],
+                        EmpleadosState.masked_email,
+                    ),
+                ),
+                rx.el.button(
+                    rx.cond(
+                        EmpleadosState.is_email_editable,
+                        rx.icon("eye-off", class_name="h-4 w-4 text-gray-500"),
+                        rx.icon("pencil", class_name="h-4 w-4 text-blue-600"),
+                    ),
+                    on_click=EmpleadosState.toggle_email_editable,
+                    class_name="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 hover:bg-gray-100 rounded-md transition-colors",
+                    title=rx.cond(
+                        EmpleadosState.is_email_editable,
+                        "Ocultar email",
+                        "Editar email",
+                    ),
+                ),
+                class_name="relative",
+            ),
+            rx.cond(
+                ~EmpleadosState.is_email_editable,
+                rx.el.p(
+                    rx.icon("shield-check", class_name="inline h-3 w-3 mr-1"),
+                    "Email enmascarado por seguridad",
+                    class_name="text-[10px] text-gray-400 mt-1 flex items-center",
+                ),
+                None,
+            ),
+            class_name="w-full mb-4",
         ),
         rx.el.div(
             rx.el.h4(
