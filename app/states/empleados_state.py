@@ -299,6 +299,8 @@ class EmpleadosState(DatabaseState):
             await self._execute_write(alter_query_dir, target_db="novalink")
             alter_query_auth = "ALTER TABLE public.empleados ADD COLUMN IF NOT EXISTS nivelautorizacion SMALLINT DEFAULT 0"
             await self._execute_write(alter_query_auth, target_db="novalink")
+            alter_query_codalt = "ALTER TABLE public.empleados ADD COLUMN IF NOT EXISTS codigoalterno VARCHAR(20) DEFAULT ''"
+            await self._execute_write(alter_query_codalt, target_db="novalink")
             fix_nulls_query = "UPDATE public.empleados SET nivelautorizacion = 0 WHERE nivelautorizacion IS NULL"
             await self._execute_write(fix_nulls_query, target_db="novalink")
             force_default_query = "ALTER TABLE public.empleados ALTER COLUMN nivelautorizacion SET DEFAULT 0"
