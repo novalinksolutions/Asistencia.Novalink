@@ -12,6 +12,7 @@ class Employee(TypedDict):
     nombres: str
     apellidos: str
     correoelectronico: str
+    telefono: str
     ganarecargonocturno: bool
     ganasobretiempo: bool
     stconautorizacion: bool
@@ -46,6 +47,7 @@ class EmpleadosState(DatabaseState):
         "nombres": "",
         "apellidos": "",
         "correoelectronico": "",
+        "telefono": "",
         "ganarecargonocturno": False,
         "ganasobretiempo": False,
         "stconautorizacion": False,
@@ -166,6 +168,10 @@ class EmpleadosState(DatabaseState):
         self.selected_employee[field] = value
 
     @rx.event
+    def set_telefono(self, value: str):
+        self.selected_employee["telefono"] = value
+
+    @rx.event
     def set_int_field(self, field: str, value: str):
         try:
             self.selected_employee[field] = int(value)
@@ -199,6 +205,7 @@ class EmpleadosState(DatabaseState):
             "nombres": "",
             "apellidos": "",
             "correoelectronico": "",
+            "telefono": "",
             "ganarecargonocturno": False,
             "ganasobretiempo": False,
             "stconautorizacion": False,
@@ -247,6 +254,7 @@ class EmpleadosState(DatabaseState):
                     apellidos VARCHAR(50),
                     nombres VARCHAR(50),
                     correoelectronico VARCHAR(50),
+                    telefono VARCHAR(20),
                     ganarecargonocturno BOOLEAN DEFAULT false,
                     ganasobretiempo BOOLEAN DEFAULT false,
                     stconautorizacion BOOLEAN DEFAULT false,
@@ -274,6 +282,8 @@ class EmpleadosState(DatabaseState):
             await self._execute_write(query, target_db="novalink")
             alter_query = "ALTER TABLE public.empleados ADD COLUMN IF NOT EXISTS grupo BIGINT DEFAULT 0"
             await self._execute_write(alter_query, target_db="novalink")
+            alter_query_tel = "ALTER TABLE public.empleados ADD COLUMN IF NOT EXISTS telefono VARCHAR(20)"
+            await self._execute_write(alter_query_tel, target_db="novalink")
         except Exception as e:
             logging.exception(f"Error ensuring empleados table: {e}")
 
@@ -336,7 +346,7 @@ class EmpleadosState(DatabaseState):
         try:
             query = """
                 SELECT 
-                    id, cedula, codigoalterno, nombres, apellidos, correoelectronico,
+                    id, cedula, codigoalterno, nombres, apellidos, correoelectronico, telefono,
                     ganarecargonocturno, ganasobretiempo, stconautorizacion,
                     ganarecargodialibre, offline,
                     niveladm1, niveladm2, niveladm3, niveladm4, niveladm5,
@@ -354,6 +364,7 @@ class EmpleadosState(DatabaseState):
                     nombres=row["nombres"] or "",
                     apellidos=row["apellidos"] or "",
                     correoelectronico=row["correoelectronico"] or "",
+                    telefono=row["telefono"] or "",
                     ganarecargonocturno=bool(row["ganarecargonocturno"]),
                     ganasobretiempo=bool(row["ganasobretiempo"]),
                     stconautorizacion=bool(row["stconautorizacion"]),
@@ -406,13 +417,13 @@ class EmpleadosState(DatabaseState):
                     )
                 query = """
                     INSERT INTO public.empleados (
-                        id, cedula, codigoalterno, nombres, apellidos, correoelectronico,
+                        id, cedula, codigoalterno, nombres, apellidos, correoelectronico, telefono,
                         ganarecargonocturno, ganasobretiempo, stconautorizacion, ganarecargodialibre, offline,
                         niveladm1, niveladm2, niveladm3, niveladm4, niveladm5,
                         cargo, tipo, grupo, atributotabular, atributotexto,
                         accesoweb, pwd, activo, fechacreacion, usuariocrea)
                     VALUES (
-                        :id, :cedula, :cod_alt, :nombres, :apellidos, :email,
+                        :id, :cedula, :cod_alt, :nombres, :apellidos, :email, :telefono,
                         :grn, :gst, :ast, :rel, :app,
                         :n1, :n2, :n3, :n4, :n5,
                         :cc, :cte, :grp, :cat, :atxt,
@@ -426,6 +437,7 @@ class EmpleadosState(DatabaseState):
                     "nombres": emp["nombres"],
                     "apellidos": emp["apellidos"],
                     "email": emp["correoelectronico"],
+                    "telefono": emp.get("telefono", ""),
                     "grn": emp["ganarecargonocturno"],
                     "gst": emp["ganasobretiempo"],
                     "ast": emp["stconautorizacion"],
@@ -464,7 +476,7 @@ class EmpleadosState(DatabaseState):
                 query = """
                     UPDATE public.empleados SET
                         id = :new_id,
-                        cedula = :cedula, codigoalterno = :cod_alt, nombres = :nombres, apellidos = :apellidos, correoelectronico = :email,
+                        cedula = :cedula, codigoalterno = :cod_alt, nombres = :nombres, apellidos = :apellidos, correoelectronico = :email, telefono = :telefono,
                         ganarecargonocturno = :grn, ganasobretiempo = :gst, stconautorizacion = :ast, ganarecargodialibre = :rel, offline = :app,
                         niveladm1 = :n1, niveladm2 = :n2, niveladm3 = :n3, niveladm4 = :n4, niveladm5 = :n5,
                         cargo = :cc, tipo = :cte, grupo = :grp, atributotabular = :cat, atributotexto = :atxt,
@@ -479,6 +491,7 @@ class EmpleadosState(DatabaseState):
                     "nombres": emp["nombres"],
                     "apellidos": emp["apellidos"],
                     "email": emp["correoelectronico"],
+                    "telefono": emp.get("telefono", ""),
                     "grn": emp["ganarecargonocturno"],
                     "gst": emp["ganasobretiempo"],
                     "ast": emp["stconautorizacion"],

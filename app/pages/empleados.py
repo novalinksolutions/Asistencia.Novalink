@@ -174,6 +174,10 @@ def tab_datos_basicos() -> rx.Component:
             class_name="w-full mb-4",
         ),
         rx.el.div(
+            form_input("Teléfono", "telefono", placeholder="Número de teléfono"),
+            class_name="w-full mb-4",
+        ),
+        rx.el.div(
             rx.el.h4(
                 "Configuración de Nómina y Asistencia",
                 class_name="text-sm font-semibold text-gray-900 mt-6 mb-3",
