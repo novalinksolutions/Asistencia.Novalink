@@ -292,38 +292,56 @@ class EmpleadosState(DatabaseState):
                 )
             """
             await self._execute_write(query, target_db="novalink")
-            alter_query_usr = "ALTER TABLE public.empleados ADD COLUMN IF NOT EXISTS usuario BIGINT DEFAULT 1"
-            await self._execute_write(alter_query_usr, target_db="novalink")
-            alter_query = "ALTER TABLE public.empleados ADD COLUMN IF NOT EXISTS grupo BIGINT DEFAULT 0"
-            await self._execute_write(alter_query, target_db="novalink")
-            alter_query_tel = "ALTER TABLE public.empleados ADD COLUMN IF NOT EXISTS telefono VARCHAR(50) DEFAULT ''"
-            await self._execute_write(alter_query_tel, target_db="novalink")
-            mod_query_tel = "ALTER TABLE public.empleados ALTER COLUMN telefono TYPE VARCHAR(50), ALTER COLUMN telefono SET DEFAULT ''"
-            await self._execute_write(mod_query_tel, target_db="novalink")
-            fix_nulls_tel = (
-                "UPDATE public.empleados SET telefono = '' WHERE telefono IS NULL"
-            )
-            await self._execute_write(fix_nulls_tel, target_db="novalink")
-            alter_query_dir = "ALTER TABLE public.empleados ADD COLUMN IF NOT EXISTS direccion VARCHAR(200) DEFAULT ''"
-            await self._execute_write(alter_query_dir, target_db="novalink")
-            mod_query_dir = "ALTER TABLE public.empleados ALTER COLUMN direccion TYPE VARCHAR(200), ALTER COLUMN direccion SET DEFAULT ''"
-            await self._execute_write(mod_query_dir, target_db="novalink")
-            fix_nulls_dir = (
-                "UPDATE public.empleados SET direccion = '' WHERE direccion IS NULL"
-            )
-            await self._execute_write(fix_nulls_dir, target_db="novalink")
-            alter_query_fnac = "ALTER TABLE public.empleados ADD COLUMN IF NOT EXISTS fechanacimiento DATE DEFAULT NOW()"
-            await self._execute_write(alter_query_fnac, target_db="novalink")
-            alter_query_st = "ALTER TABLE public.empleados ADD COLUMN IF NOT EXISTS solotarjeta BOOLEAN DEFAULT false"
-            await self._execute_write(alter_query_st, target_db="novalink")
-            fix_nulls_st = "UPDATE public.empleados SET solotarjeta = false WHERE solotarjeta IS NULL"
-            await self._execute_write(fix_nulls_st, target_db="novalink")
-            alter_query_auth = "ALTER TABLE public.empleados ADD COLUMN IF NOT EXISTS nivelautorizacion SMALLINT DEFAULT 0"
-            await self._execute_write(alter_query_auth, target_db="novalink")
-            fix_nulls_query = "UPDATE public.empleados SET nivelautorizacion = 0 WHERE nivelautorizacion IS NULL"
-            await self._execute_write(fix_nulls_query, target_db="novalink")
-            force_default_query = "ALTER TABLE public.empleados ALTER COLUMN nivelautorizacion SET DEFAULT 0"
-            await self._execute_write(force_default_query, target_db="novalink")
+            try:
+                await self._execute_write(
+                    "ALTER TABLE public.empleados DISABLE TRIGGER tr_log_empleados",
+                    target_db="novalink",
+                )
+            except Exception as e:
+                logging.exception(
+                    f"Could not disable trigger tr_log_empleados (might not exist): {e}"
+                )
+            try:
+                alter_query_usr = "ALTER TABLE public.empleados ADD COLUMN IF NOT EXISTS usuario BIGINT DEFAULT 1"
+                await self._execute_write(alter_query_usr, target_db="novalink")
+                alter_query = "ALTER TABLE public.empleados ADD COLUMN IF NOT EXISTS grupo BIGINT DEFAULT 0"
+                await self._execute_write(alter_query, target_db="novalink")
+                alter_query_tel = "ALTER TABLE public.empleados ADD COLUMN IF NOT EXISTS telefono VARCHAR(50) DEFAULT ''"
+                await self._execute_write(alter_query_tel, target_db="novalink")
+                mod_query_tel = "ALTER TABLE public.empleados ALTER COLUMN telefono TYPE VARCHAR(50), ALTER COLUMN telefono SET DEFAULT ''"
+                await self._execute_write(mod_query_tel, target_db="novalink")
+                fix_nulls_tel = (
+                    "UPDATE public.empleados SET telefono = '' WHERE telefono IS NULL"
+                )
+                await self._execute_write(fix_nulls_tel, target_db="novalink")
+                alter_query_dir = "ALTER TABLE public.empleados ADD COLUMN IF NOT EXISTS direccion VARCHAR(200) DEFAULT ''"
+                await self._execute_write(alter_query_dir, target_db="novalink")
+                mod_query_dir = "ALTER TABLE public.empleados ALTER COLUMN direccion TYPE VARCHAR(200), ALTER COLUMN direccion SET DEFAULT ''"
+                await self._execute_write(mod_query_dir, target_db="novalink")
+                fix_nulls_dir = (
+                    "UPDATE public.empleados SET direccion = '' WHERE direccion IS NULL"
+                )
+                await self._execute_write(fix_nulls_dir, target_db="novalink")
+                alter_query_fnac = "ALTER TABLE public.empleados ADD COLUMN IF NOT EXISTS fechanacimiento DATE DEFAULT NOW()"
+                await self._execute_write(alter_query_fnac, target_db="novalink")
+                alter_query_st = "ALTER TABLE public.empleados ADD COLUMN IF NOT EXISTS solotarjeta BOOLEAN DEFAULT false"
+                await self._execute_write(alter_query_st, target_db="novalink")
+                fix_nulls_st = "UPDATE public.empleados SET solotarjeta = false WHERE solotarjeta IS NULL"
+                await self._execute_write(fix_nulls_st, target_db="novalink")
+                alter_query_auth = "ALTER TABLE public.empleados ADD COLUMN IF NOT EXISTS nivelautorizacion SMALLINT DEFAULT 0"
+                await self._execute_write(alter_query_auth, target_db="novalink")
+                fix_nulls_query = "UPDATE public.empleados SET nivelautorizacion = 0 WHERE nivelautorizacion IS NULL"
+                await self._execute_write(fix_nulls_query, target_db="novalink")
+                force_default_query = "ALTER TABLE public.empleados ALTER COLUMN nivelautorizacion SET DEFAULT 0"
+                await self._execute_write(force_default_query, target_db="novalink")
+            finally:
+                try:
+                    await self._execute_write(
+                        "ALTER TABLE public.empleados ENABLE TRIGGER tr_log_empleados",
+                        target_db="novalink",
+                    )
+                except Exception as e:
+                    logging.exception(f"Could not enable trigger tr_log_empleados: {e}")
         except Exception as e:
             logging.exception(f"Error ensuring empleados table: {e}")
 
