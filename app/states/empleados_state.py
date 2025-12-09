@@ -117,6 +117,12 @@ class EmpleadosState(DatabaseState):
         self.is_email_editable = not self.is_email_editable
 
     @rx.var
+    def id_display_value(self) -> str:
+        """Display value for the ID input."""
+        val = self.selected_employee["id"]
+        return "" if val == 0 else str(val)
+
+    @rx.var
     def filtered_employees(self) -> list[Employee]:
         items = self.employees
         if not self.show_inactive:
@@ -168,14 +174,13 @@ class EmpleadosState(DatabaseState):
     @rx.event
     def set_id(self, value: str):
         """Handle manual ID input for new employees."""
-        if not value:
-            self.selected_employee["id"] = 0
-            return
         numeric_value = "".join(filter(str.isdigit, value))
         if len(numeric_value) > 10:
             numeric_value = numeric_value[:10]
         if numeric_value:
             self.selected_employee["id"] = int(numeric_value)
+        else:
+            self.selected_employee["id"] = 0
 
     @rx.event
     def new_employee(self):

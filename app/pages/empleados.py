@@ -100,11 +100,6 @@ def id_input() -> rx.Component:
         ),
         rx.el.input(
             type="text",
-            default_value=rx.cond(
-                EmpleadosState.selected_employee["id"] == 0,
-                "",
-                EmpleadosState.selected_employee["id"].to(str),
-            ),
             read_only=EmpleadosState.editing_employee_id != 0,
             placeholder="Ingrese 10 dígitos",
             on_change=EmpleadosState.set_id,
@@ -114,6 +109,7 @@ def id_input() -> rx.Component:
                 "w-full px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-500 cursor-not-allowed",
                 "w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all bg-white",
             ),
+            default_value=EmpleadosState.id_display_value,
         ),
         class_name="w-full",
     )
