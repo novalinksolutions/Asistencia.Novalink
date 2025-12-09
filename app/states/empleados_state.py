@@ -139,18 +139,19 @@ class EmpleadosState(DatabaseState):
 
     @rx.var
     def filtered_employees(self) -> list[Employee]:
+        if len(self.search_query) < 3:
+            return []
         items = self.employees
         if not self.show_inactive:
             items = [e for e in items if e["activo"]]
-        if self.search_query:
-            q = self.search_query.lower()
-            items = [
-                e
-                for e in items
-                if q in e["nombres"].lower()
-                or q in e["apellidos"].lower()
-                or q in e["cedula"].lower()
-            ]
+        q = self.search_query.lower()
+        items = [
+            e
+            for e in items
+            if q in e["nombres"].lower()
+            or q in e["apellidos"].lower()
+            or q in e["cedula"].lower()
+        ]
         return items
 
     @rx.var
