@@ -24,6 +24,7 @@ class Employee(TypedDict):
     niveladm5: int
     cargo: int
     tipo: int
+    grupo: int
     atributotabular: int
     atributotexto: str
     accesoweb: bool
@@ -57,6 +58,7 @@ class EmpleadosState(DatabaseState):
         "niveladm5": 0,
         "cargo": 0,
         "tipo": 0,
+        "grupo": 0,
         "atributotabular": 0,
         "atributotexto": "",
         "accesoweb": False,
@@ -69,6 +71,7 @@ class EmpleadosState(DatabaseState):
     cat_nivel4: list[CatalogItem] = []
     cat_nivel5: list[CatalogItem] = []
     cat_cargos: list[CatalogItem] = []
+    cat_grupos: list[CatalogItem] = []
     cat_tipos: list[CatalogItem] = []
     cat_attr_tabular: list[CatalogItem] = []
     search_query: str = ""
@@ -208,6 +211,7 @@ class EmpleadosState(DatabaseState):
             "niveladm5": 0,
             "cargo": 0,
             "tipo": 0,
+            "grupo": 0,
             "atributotabular": 0,
             "atributotexto": "",
             "accesoweb": False,
@@ -255,6 +259,7 @@ class EmpleadosState(DatabaseState):
                     niveladm5 BIGINT DEFAULT 0,
                     cargo BIGINT DEFAULT 0,
                     tipo BIGINT DEFAULT 0,
+                    grupo BIGINT DEFAULT 0,
                     atributotabular BIGINT DEFAULT 0,
                     atributotexto VARCHAR(10),
                     accesoweb BOOLEAN DEFAULT false,
@@ -267,6 +272,8 @@ class EmpleadosState(DatabaseState):
                 )
             """
             await self._execute_write(query, target_db="novalink")
+            alter_query = "ALTER TABLE public.empleados ADD COLUMN IF NOT EXISTS grupo BIGINT DEFAULT 0"
+            await self._execute_write(alter_query, target_db="novalink")
         except Exception as e:
             logging.exception(f"Error ensuring empleados table: {e}")
 
@@ -320,6 +327,7 @@ class EmpleadosState(DatabaseState):
         self.cat_nivel4 = await self._fetch_catalog("niveladm4")
         self.cat_nivel5 = await self._fetch_catalog("niveladm5")
         self.cat_cargos = await self._fetch_catalog("cargos")
+        self.cat_grupos = await self._fetch_catalog("grupos")
         self.cat_tipos = await self._fetch_catalog("tipoempleado")
         self.cat_attr_tabular = await self._fetch_catalog("atributotabularemp")
 
@@ -332,7 +340,7 @@ class EmpleadosState(DatabaseState):
                     ganarecargonocturno, ganasobretiempo, stconautorizacion,
                     ganarecargodialibre, offline,
                     niveladm1, niveladm2, niveladm3, niveladm4, niveladm5,
-                    cargo, tipo, atributotabular, atributotexto,
+                    cargo, tipo, grupo, atributotabular, atributotexto,
                     accesoweb, pwd, activo
                 FROM public.empleados
                 ORDER BY apellidos, nombres
@@ -358,6 +366,7 @@ class EmpleadosState(DatabaseState):
                     niveladm5=row["niveladm5"] or 0,
                     cargo=row["cargo"] or 0,
                     tipo=row["tipo"] or 0,
+                    grupo=row["grupo"] or 0,
                     atributotabular=row["atributotabular"] or 0,
                     atributotexto=row["atributotexto"] or "",
                     accesoweb=bool(row["accesoweb"]),
@@ -400,13 +409,13 @@ class EmpleadosState(DatabaseState):
                         id, cedula, codigoalterno, nombres, apellidos, correoelectronico,
                         ganarecargonocturno, ganasobretiempo, stconautorizacion, ganarecargodialibre, offline,
                         niveladm1, niveladm2, niveladm3, niveladm4, niveladm5,
-                        cargo, tipo, atributotabular, atributotexto,
+                        cargo, tipo, grupo, atributotabular, atributotexto,
                         accesoweb, pwd, activo, fechacreacion, usuariocrea)
                     VALUES (
                         :id, :cedula, :cod_alt, :nombres, :apellidos, :email,
                         :grn, :gst, :ast, :rel, :app,
                         :n1, :n2, :n3, :n4, :n5,
-                        :cc, :cte, :cat, :atxt,
+                        :cc, :cte, :grp, :cat, :atxt,
                         :web, :pwd, :activo, NOW(), :uid
                     )
                 """
@@ -429,6 +438,7 @@ class EmpleadosState(DatabaseState):
                     "n5": emp["niveladm5"],
                     "cc": emp["cargo"],
                     "cte": emp["tipo"],
+                    "grp": emp.get("grupo", 0),
                     "cat": emp["atributotabular"],
                     "atxt": emp["atributotexto"],
                     "web": emp["accesoweb"],
@@ -457,7 +467,7 @@ class EmpleadosState(DatabaseState):
                         cedula = :cedula, codigoalterno = :cod_alt, nombres = :nombres, apellidos = :apellidos, correoelectronico = :email,
                         ganarecargonocturno = :grn, ganasobretiempo = :gst, stconautorizacion = :ast, ganarecargodialibre = :rel, offline = :app,
                         niveladm1 = :n1, niveladm2 = :n2, niveladm3 = :n3, niveladm4 = :n4, niveladm5 = :n5,
-                        cargo = :cc, tipo = :cte, atributotabular = :cat, atributotexto = :atxt,
+                        cargo = :cc, tipo = :cte, grupo = :grp, atributotabular = :cat, atributotexto = :atxt,
                         accesoweb = :web, pwd = :pwd, activo = :activo, fechamodificacion = NOW(), usuariomodifica = :uid
                     WHERE id = :old_id
                 """

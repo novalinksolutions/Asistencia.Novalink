@@ -257,6 +257,7 @@ def tab_organizacional() -> rx.Component:
             rx.el.div(
                 form_select("Cargo", "cargo", EmpleadosState.cat_cargos),
                 form_select("Tipo de Empleado", "tipo", EmpleadosState.cat_tipos),
+                form_select("Grupo", "grupo", EmpleadosState.cat_grupos),
                 rx.cond(
                     EmpleadosState.has_attr_tabular,
                     form_select(
