@@ -110,7 +110,8 @@ def tab_datos_basicos() -> rx.Component:
                 class_name="w-full",
             ),
             form_input("Cédula", "cedula", placeholder="0000000000"),
-            class_name="grid grid-cols-2 gap-4 mb-4",
+            form_input("Código Alterno", "codigoalterno", placeholder="Opcional"),
+            class_name="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4",
         ),
         rx.el.div(
             form_input("Nombres", "nombres", placeholder="Nombres completos"),

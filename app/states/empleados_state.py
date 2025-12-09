@@ -8,6 +8,7 @@ from app.states.database_state import DatabaseState
 class Employee(TypedDict):
     id: int
     cedula: str
+    codigoalterno: str
     nombres: str
     apellidos: str
     correoelectronico: str
@@ -40,6 +41,7 @@ class EmpleadosState(DatabaseState):
     selected_employee: Employee = {
         "id": 0,
         "cedula": "",
+        "codigoalterno": "",
         "nombres": "",
         "apellidos": "",
         "correoelectronico": "",
@@ -190,6 +192,7 @@ class EmpleadosState(DatabaseState):
         self.selected_employee = {
             "id": 0,
             "cedula": "",
+            "codigoalterno": "",
             "nombres": "",
             "apellidos": "",
             "correoelectronico": "",
@@ -235,6 +238,7 @@ class EmpleadosState(DatabaseState):
                 CREATE TABLE IF NOT EXISTS public.empleados (
                     id BIGINT PRIMARY KEY,
                     cedula VARCHAR(20),
+                    codigoalterno VARCHAR(20) DEFAULT '',
                     apellidos VARCHAR(50),
                     nombres VARCHAR(50),
                     correoelectronico VARCHAR(50),
@@ -323,7 +327,7 @@ class EmpleadosState(DatabaseState):
         try:
             query = """
                 SELECT 
-                    id, cedula, nombres, apellidos, correoelectronico,
+                    id, cedula, codigoalterno, nombres, apellidos, correoelectronico,
                     ganarecargonocturno, ganasobretiempo, stconautorizacion,
                     ganarecargodialibre, offline,
                     niveladm1, niveladm2, niveladm3, niveladm4, niveladm5,
@@ -337,6 +341,7 @@ class EmpleadosState(DatabaseState):
                 Employee(
                     id=row["id"],
                     cedula=row["cedula"] or "",
+                    codigoalterno=row["codigoalterno"] or "",
                     nombres=row["nombres"] or "",
                     apellidos=row["apellidos"] or "",
                     correoelectronico=row["correoelectronico"] or "",
@@ -391,13 +396,13 @@ class EmpleadosState(DatabaseState):
                     )
                 query = """
                     INSERT INTO public.empleados (
-                        id, cedula, nombres, apellidos, correoelectronico,
+                        id, cedula, codigoalterno, nombres, apellidos, correoelectronico,
                         ganarecargonocturno, ganasobretiempo, stconautorizacion, ganarecargodialibre, offline,
                         niveladm1, niveladm2, niveladm3, niveladm4, niveladm5,
                         cargo, tipo, atributotabular, atributotexto,
                         accesoweb, pwd, activo, fechacreacion, usuariocrea)
                     VALUES (
-                        :id, :cedula, :nombres, :apellidos, :email,
+                        :id, :cedula, :cod_alt, :nombres, :apellidos, :email,
                         :grn, :gst, :ast, :rel, :app,
                         :n1, :n2, :n3, :n4, :n5,
                         :cc, :cte, :cat, :atxt,
@@ -407,6 +412,7 @@ class EmpleadosState(DatabaseState):
                 params = {
                     "id": new_id,
                     "cedula": emp["cedula"],
+                    "cod_alt": emp.get("codigoalterno", ""),
                     "nombres": emp["nombres"],
                     "apellidos": emp["apellidos"],
                     "email": emp["correoelectronico"],
@@ -447,7 +453,7 @@ class EmpleadosState(DatabaseState):
                 query = """
                     UPDATE public.empleados SET
                         id = :new_id,
-                        cedula = :cedula, nombres = :nombres, apellidos = :apellidos, correoelectronico = :email,
+                        cedula = :cedula, codigoalterno = :cod_alt, nombres = :nombres, apellidos = :apellidos, correoelectronico = :email,
                         ganarecargonocturno = :grn, ganasobretiempo = :gst, stconautorizacion = :ast, ganarecargodialibre = :rel, offline = :app,
                         niveladm1 = :n1, niveladm2 = :n2, niveladm3 = :n3, niveladm4 = :n4, niveladm5 = :n5,
                         cargo = :cc, tipo = :cte, atributotabular = :cat, atributotexto = :atxt,
@@ -458,6 +464,7 @@ class EmpleadosState(DatabaseState):
                     "new_id": new_id,
                     "old_id": original_id,
                     "cedula": emp["cedula"],
+                    "cod_alt": emp.get("codigoalterno", ""),
                     "nombres": emp["nombres"],
                     "apellidos": emp["apellidos"],
                     "email": emp["correoelectronico"],
