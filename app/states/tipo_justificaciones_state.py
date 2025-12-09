@@ -8,7 +8,6 @@ from sqlalchemy import text
 class Justificacion(TypedDict):
     id: str
     descripcion: str
-    cod_alterno: str
     dias_maximo: int
     horas_maximo: float
     dias_ingreso: int
@@ -30,7 +29,6 @@ class TipoJustificacionesState(DatabaseState):
     modal_justificacion: Justificacion = {
         "id": "0",
         "descripcion": "",
-        "cod_alterno": "",
         "dias_maximo": 0,
         "horas_maximo": 0.0,
         "dias_ingreso": 0,
@@ -69,7 +67,6 @@ class TipoJustificacionesState(DatabaseState):
                 SELECT 
                     codigo::text as id,
                     descripcion,
-                    COALESCE(codalterno, '') as codalterno,
                     COALESCE(dias_maximo, 0) as dias_maximo,
                     COALESCE(horas_maximo, 0) as horas_maximo,
                     COALESCE(dias_ingreso, 0) as dias_ingreso,
@@ -92,7 +89,6 @@ class TipoJustificacionesState(DatabaseState):
                     Justificacion(
                         id=row["id"],
                         descripcion=row["descripcion"],
-                        cod_alterno=row["codalterno"],
                         dias_maximo=int(row["dias_maximo"]),
                         horas_maximo=float(row["horas_maximo"]),
                         dias_ingreso=int(row["dias_ingreso"]),
@@ -118,7 +114,6 @@ class TipoJustificacionesState(DatabaseState):
         return {
             "id": "0",
             "descripcion": "",
-            "cod_alterno": "",
             "dias_maximo": 0,
             "horas_maximo": 0.0,
             "dias_ingreso": 0,
@@ -152,7 +147,6 @@ class TipoJustificacionesState(DatabaseState):
     @rx.event
     async def handle_submit(self, form_data: dict):
         descripcion_input = form_data.get("descripcion", "").strip()
-        cod_alterno = form_data.get("cod_alterno", "").strip()
         try:
             dias_maximo = int(form_data.get("dias_maximo") or 0)
             horas_maximo = float(form_data.get("horas_maximo") or 0)
@@ -177,7 +171,6 @@ class TipoJustificacionesState(DatabaseState):
         user_id = base_state.logged_user_id or 1
         params = {
             "desc": descripcion_input,
-            "cod_alt": cod_alterno,
             "dias_max": dias_maximo,
             "horas_max": horas_maximo,
             "dias_ing": dias_ingreso,
@@ -198,7 +191,6 @@ class TipoJustificacionesState(DatabaseState):
                     UPDATE detallejustificacion
                     SET 
                         descripcion = :desc, 
-                        codalterno = :cod_alt,
                         dias_maximo = :dias_max,
                         horas_maximo = :horas_max,
                         dias_ingreso = :dias_ing,
@@ -226,13 +218,13 @@ class TipoJustificacionesState(DatabaseState):
                 params["id"] = next_id
                 query = """
                     INSERT INTO detallejustificacion (
-                        codigo, descripcion, codalterno, dias_maximo, horas_maximo, dias_ingreso,
+                        codigo, descripcion, dias_maximo, horas_maximo, dias_ingreso,
                         completafalta, completaatraso, justificacion, permiso, dias_habiles, 
                         documentoobligatorio, cargovacaciones, acumula_vacaciones,
                         activo, usuario_crea, fecha_creacion, orden, usuario_modifica
                     )
                     VALUES (
-                        :id, :desc, :cod_alt, :dias_max, :horas_max, :dias_ing,
+                        :id, :desc, :dias_max, :horas_max, :dias_ing,
                         :c_falta, :c_atraso, :justif, :perm, :d_habiles,
                         :doc_oblig, :c_vac, :a_vac,
                         :activo, :uid, NOW(), 0, 0

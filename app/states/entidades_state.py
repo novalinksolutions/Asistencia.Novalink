@@ -9,7 +9,6 @@ class EntidadItem(TypedDict):
     descripcion: str
     fecha_creacion: str
     usuario: str
-    cod_alterno: str
     parent_id: int
     activo: bool
 
@@ -31,7 +30,6 @@ class EntidadesState(DatabaseState):
         "descripcion": "",
         "fecha_creacion": "",
         "usuario": "",
-        "cod_alterno": "",
         "parent_id": 0,
         "activo": True,
     }
@@ -94,7 +92,6 @@ class EntidadesState(DatabaseState):
             "descripcion": "",
             "fecha_creacion": "",
             "usuario": "",
-            "cod_alterno": "",
             "parent_id": 0,
             "activo": True,
         }
@@ -132,7 +129,6 @@ class EntidadesState(DatabaseState):
             "descripcion": "",
             "fecha_creacion": "",
             "usuario": "",
-            "cod_alterno": "",
             "parent_id": 0,
             "activo": True,
         }
@@ -273,7 +269,6 @@ class EntidadesState(DatabaseState):
                         descripcion,
                         COALESCE(to_char(fechacreacion, 'YYYY-MM-DD HH24:MI'), '') as fecha_creacion,
                         COALESCE(usuario, '') as usuario,
-                        '' as cod_alterno,
                         COALESCE(activo, true) as activo,
                         COALESCE(niveladm1, 0) as parent_id
                     FROM public.cargos 
@@ -286,7 +281,6 @@ class EntidadesState(DatabaseState):
                         descripcion,
                         COALESCE(to_char(fechacreacion, 'YYYY-MM-DD HH24:MI'), '') as fecha_creacion,
                         COALESCE(usuario, '') as usuario,
-                        '' as cod_alterno,
                         COALESCE(activo, true) as activo,
                         COALESCE(niveladm1, 0) as parent_id
                     FROM public.grupos 
@@ -299,7 +293,6 @@ class EntidadesState(DatabaseState):
                         descripcion,
                         COALESCE(to_char(fechacreacion, 'YYYY-MM-DD HH24:MI'), '') as fecha_creacion,
                         COALESCE(usuario, '') as usuario,
-                        '' as cod_alterno,
                         COALESCE(activo, true) as activo,
                         0 as parent_id
                     FROM public.tipoempleado 
@@ -312,7 +305,6 @@ class EntidadesState(DatabaseState):
                         descripcion,
                         COALESCE(to_char(fechacreacion, 'YYYY-MM-DD HH24:MI'), '') as fecha_creacion,
                         COALESCE(usuario, '') as usuario,
-                        '' as cod_alterno,
                         COALESCE(activo, true) as activo,
                         COALESCE(niveladm1, 0) as parent_id
                     FROM public.atributotabularemp 
@@ -330,7 +322,7 @@ class EntidadesState(DatabaseState):
                     parent_col = ", COALESCE(niveladm4, 0) as parent_id"
                 else:
                     parent_col = ", 0 as parent_id"
-                query = f"\n                    SELECT \n                        codigo,\n                        descripcion,\n                        COALESCE(to_char(fechacreacion, 'YYYY-MM-DD HH24:MI'), '') as fecha_creacion,\n                        COALESCE(usuario, '') as usuario,\n                        COALESCE(codalterno, '') as cod_alterno,\n                        COALESCE(activo, true) as activo{parent_col}\n                    FROM public.{self.table_name} \n                    ORDER BY descripcion ASC\n                "
+                query = f"\n                    SELECT \n                        codigo,\n                        descripcion,\n                        COALESCE(to_char(fechacreacion, 'YYYY-MM-DD HH24:MI'), '') as fecha_creacion,\n                        COALESCE(usuario, '') as usuario,\n                        COALESCE(activo, true) as activo{parent_col}\n                    FROM public.{self.table_name} \n                    ORDER BY descripcion ASC\n                "
             results = await self._execute_query(query)
             self.items = [
                 EntidadItem(
@@ -338,7 +330,6 @@ class EntidadesState(DatabaseState):
                     descripcion=row["descripcion"],
                     fecha_creacion=row["fecha_creacion"],
                     usuario=row["usuario"],
-                    cod_alterno=row["cod_alterno"],
                     parent_id=int(row["parent_id"]),
                     activo=bool(row.get("activo", True)),
                 )

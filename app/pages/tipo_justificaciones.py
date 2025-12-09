@@ -42,22 +42,6 @@ def justificacion_modal() -> rx.Component:
                     ),
                     rx.el.form(
                         rx.el.div(
-                            rx.el.div(
-                                rx.el.div(
-                                    rx.el.label(
-                                        "Código Alterno",
-                                        class_name="text-sm text-muted-foreground block mb-1",
-                                    ),
-                                    rx.el.input(
-                                        name="cod_alterno",
-                                        default_value=TipoJustificacionesState.modal_justificacion[
-                                            "cod_alterno"
-                                        ],
-                                        class_name="w-full px-3 py-2 rounded-lg border-input bg-background shadow-sm focus:ring-2 focus:ring-ring transition-smooth",
-                                    ),
-                                ),
-                                class_name="grid grid-cols-1 gap-4 mb-4",
-                            ),
                             rx.el.label(
                                 "Descripción",
                                 class_name="text-sm text-muted-foreground block mb-1",
