@@ -484,6 +484,8 @@ class EmpleadosState(DatabaseState):
     @rx.event
     async def save_employee(self):
         emp = self.selected_employee
+        emp["nombres"] = emp["nombres"].strip().upper()
+        emp["apellidos"] = emp["apellidos"].strip().upper()
         validation_errors = []
         if not self.id_input:
             validation_errors.append("El ID es obligatorio")
