@@ -70,7 +70,6 @@ class EmpleadosState(DatabaseState):
     cat_tipos: list[CatalogItem] = []
     cat_attr_tabular: list[CatalogItem] = []
     search_query: str = ""
-    temp_id: str = ""
     show_inactive: bool = False
     is_editing: bool = False
     niveles_habilitados: int = 5
@@ -167,18 +166,6 @@ class EmpleadosState(DatabaseState):
         self.selected_employee[field] = checked
 
     @rx.event
-    def set_id(self, value: str):
-        """Handle manual ID input for new employees."""
-        numeric_value = "".join(filter(str.isdigit, value))
-        if len(numeric_value) > 10:
-            numeric_value = numeric_value[:10]
-        self.temp_id = numeric_value
-        if numeric_value:
-            self.selected_employee["id"] = int(numeric_value)
-        else:
-            self.selected_employee["id"] = 0
-
-    @rx.event
     def new_employee(self):
         self.editing_employee_id = 0
         self.selected_employee = {
@@ -205,14 +192,12 @@ class EmpleadosState(DatabaseState):
             "pwd": "12345678",
             "activo": True,
         }
-        self.temp_id = ""
         self.is_editing = True
 
     @rx.event
     def select_employee(self, employee: Employee):
         self.editing_employee_id = employee["id"]
         self.selected_employee = employee.copy()
-        self.temp_id = str(employee["id"])
         self.is_editing = True
         self.is_email_editable = False
 
@@ -373,31 +358,21 @@ class EmpleadosState(DatabaseState):
             pwd_val = hashlib.sha256(pwd_val.encode()).hexdigest()
         try:
             if self.editing_employee_id == 0:
-                raw_id = str(emp["id"])
-                if raw_id == "0" or not raw_id:
-                    return rx.toast.error("El ID es obligatorio.")
-                padded_id_str = raw_id.zfill(10)
-                if not padded_id_str.isdigit():
-                    return rx.toast.error("El ID debe contener solo números.")
-                if len(padded_id_str) != 10:
-                    return rx.toast.error("El ID debe tener máximo 10 dígitos.")
-                new_id = int(padded_id_str)
-                self.selected_employee["id"] = new_id
-                exists_query = "SELECT 1 FROM public.empleados WHERE id = :id"
-                exists = await self._execute_query(
-                    exists_query, {"id": new_id}, target_db="novalink"
+                max_id_query = (
+                    "SELECT COALESCE(MAX(id), 0) + 1 as next_id FROM public.empleados"
                 )
-                if exists:
-                    return rx.toast.error(
-                        f"El ID {padded_id_str} ya está registrado en el sistema."
-                    )
+                max_id_res = await self._execute_query(
+                    max_id_query, target_db="novalink"
+                )
+                new_id = max_id_res[0]["next_id"] if max_id_res else 1
+                self.selected_employee["id"] = new_id
                 query = """
                     INSERT INTO public.empleados (
                         id, cedula, nombres, apellidos, correoelectronico,
                         ganarecargonocturno, ganasobretiempo, stconautorizacion, ganarecargodialibre, offline,
                         niveladm1, niveladm2, niveladm3, niveladm4, niveladm5,
                         cargo, tipo, atributotabular, atributotexto,
-                        accesoweb, pwd, activo, fechacreacion, usuariocrea
+                        accesoweb, pwd, activo, fechacreacion, usuariocrea)
                     VALUES (
                         :id, :cedula, :nombres, :apellidos, :email,
                         :grn, :gst, :ast, :rel, :app,
