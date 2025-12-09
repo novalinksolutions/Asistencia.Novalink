@@ -411,7 +411,7 @@ def form_section() -> rx.Component:
             class_name="mt-6 pt-4 border-t border-gray-100",
         ),
         class_name="bg-white p-6 rounded-xl shadow-sm border h-full flex flex-col",
-        key=EmpleadosState.selected_employee["id"],
+        key=EmpleadosState.editing_employee_id,
     )
 
 
