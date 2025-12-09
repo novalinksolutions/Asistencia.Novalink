@@ -103,13 +103,13 @@ def tab_datos_basicos() -> rx.Component:
                 rx.el.input(
                     type="text",
                     on_change=EmpleadosState.set_id_field,
-                    placeholder="0000000000",
+                    placeholder="Id principal",
                     class_name="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all bg-white font-mono",
                     default_value=EmpleadosState.id_input,
                 ),
                 class_name="w-full",
             ),
-            form_input("Cédula", "cedula", placeholder="0000000000"),
+            form_input("Cédula", "cedula", placeholder="Cédula"),
             form_input("Código Alterno", "codigoalterno", placeholder="Opcional"),
             class_name="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4",
         ),
@@ -142,19 +142,23 @@ def tab_datos_basicos() -> rx.Component:
                         EmpleadosState.masked_email,
                     ),
                 ),
-                rx.el.button(
-                    rx.cond(
-                        EmpleadosState.is_email_editable,
-                        rx.icon("eye-off", class_name="h-4 w-4 text-gray-500"),
-                        rx.icon("pencil", class_name="h-4 w-4 text-blue-600"),
+                rx.cond(
+                    EmpleadosState.selected_employee["id"] != 0,
+                    rx.el.button(
+                        rx.cond(
+                            EmpleadosState.is_email_editable,
+                            rx.icon("eye-off", class_name="h-4 w-4 text-gray-500"),
+                            rx.icon("pencil", class_name="h-4 w-4 text-blue-600"),
+                        ),
+                        on_click=EmpleadosState.toggle_email_editable,
+                        class_name="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 hover:bg-gray-100 rounded-md transition-colors",
+                        title=rx.cond(
+                            EmpleadosState.is_email_editable,
+                            "Ocultar email",
+                            "Editar email",
+                        ),
                     ),
-                    on_click=EmpleadosState.toggle_email_editable,
-                    class_name="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 hover:bg-gray-100 rounded-md transition-colors",
-                    title=rx.cond(
-                        EmpleadosState.is_email_editable,
-                        "Ocultar email",
-                        "Editar email",
-                    ),
+                    None,
                 ),
                 class_name="relative",
             ),

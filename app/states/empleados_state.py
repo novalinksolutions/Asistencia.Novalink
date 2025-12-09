@@ -214,6 +214,7 @@ class EmpleadosState(DatabaseState):
             "pwd": "12345678",
             "activo": True,
         }
+        self.is_email_editable = True
         self.is_editing = True
 
     @rx.event
