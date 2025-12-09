@@ -85,6 +85,7 @@ class EmpleadosState(DatabaseState):
     label_attr_tabular: str = "Atributo Tabular"
     label_attr_texto: str = "Atributo Texto"
     is_email_editable: bool = False
+    editing_employee_id: int = 0
 
     @rx.var
     def masked_email(self) -> str:
@@ -165,7 +166,17 @@ class EmpleadosState(DatabaseState):
         self.selected_employee[field] = checked
 
     @rx.event
+    def set_id(self, value: str):
+        """Handle manual ID input for new employees."""
+        if not value:
+            self.selected_employee["id"] = 0
+            return
+        if value.isdigit() and len(value) <= 10:
+            self.selected_employee["id"] = int(value)
+
+    @rx.event
     def new_employee(self):
+        self.editing_employee_id = 0
         self.selected_employee = {
             "id": 0,
             "cedula": "",
@@ -194,6 +205,7 @@ class EmpleadosState(DatabaseState):
 
     @rx.event
     def select_employee(self, employee: Employee):
+        self.editing_employee_id = employee["id"]
         self.selected_employee = employee.copy()
         self.is_editing = True
         self.is_email_editable = False
@@ -354,12 +366,20 @@ class EmpleadosState(DatabaseState):
         if len(pwd_val) != 64:
             pwd_val = hashlib.sha256(pwd_val.encode()).hexdigest()
         try:
-            if emp["id"] == 0:
-                next_id_res = await self._execute_query(
-                    "SELECT COALESCE(MAX(id), 0) + 1 as next_id FROM public.empleados",
-                    target_db="novalink",
+            if self.editing_employee_id == 0:
+                new_id = emp["id"]
+                if new_id == 0 or len(new_id) != 10:
+                    return rx.toast.error(
+                        "El ID es obligatorio y debe tener exactamente 10 dígitos numéricos."
+                    )
+                exists_query = "SELECT 1 FROM public.empleados WHERE id = :id"
+                exists = await self._execute_query(
+                    exists_query, {"id": new_id}, target_db="novalink"
                 )
-                next_id = next_id_res[0]["next_id"] if next_id_res else 1
+                if exists:
+                    return rx.toast.error(
+                        f"El ID {new_id} ya está registrado en el sistema."
+                    )
                 query = """
                     INSERT INTO public.empleados (
                         id, cedula, nombres, apellidos, correoelectronico,
@@ -367,7 +387,7 @@ class EmpleadosState(DatabaseState):
                         niveladm1, niveladm2, niveladm3, niveladm4, niveladm5,
                         cargo, tipo, atributotabular, atributotexto,
                         accesoweb, pwd, activo, fechacreacion, usuariocrea
-                    ) VALUES (
+                    VALUES (
                         :id, :cedula, :nombres, :apellidos, :email,
                         :grn, :gst, :ast, :rel, :app,
                         :n1, :n2, :n3, :n4, :n5,
@@ -376,7 +396,7 @@ class EmpleadosState(DatabaseState):
                     )
                 """
                 params = {
-                    "id": next_id,
+                    "id": new_id,
                     "cedula": emp["cedula"],
                     "nombres": emp["nombres"],
                     "apellidos": emp["apellidos"],

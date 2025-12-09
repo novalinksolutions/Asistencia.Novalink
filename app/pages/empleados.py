@@ -92,10 +92,37 @@ def form_select(
     )
 
 
+def id_input() -> rx.Component:
+    return rx.el.div(
+        rx.el.label(
+            "ID (10 dígitos)",
+            class_name="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1",
+        ),
+        rx.el.input(
+            type="text",
+            default_value=rx.cond(
+                EmpleadosState.selected_employee["id"] == 0,
+                "",
+                EmpleadosState.selected_employee["id"].to(str),
+            ),
+            read_only=EmpleadosState.editing_employee_id != 0,
+            placeholder="Ingrese 10 dígitos",
+            on_change=EmpleadosState.set_id,
+            max_length=10,
+            class_name=rx.cond(
+                EmpleadosState.editing_employee_id != 0,
+                "w-full px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-500 cursor-not-allowed",
+                "w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all bg-white",
+            ),
+        ),
+        class_name="w-full",
+    )
+
+
 def tab_datos_basicos() -> rx.Component:
     return rx.el.div(
         rx.el.div(
-            form_input("ID", "id", read_only=True),
+            id_input(),
             form_input("Cédula", "cedula", placeholder="0000000000"),
             class_name="grid grid-cols-2 gap-4 mb-4",
         ),
