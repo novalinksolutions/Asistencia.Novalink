@@ -105,7 +105,7 @@ def tab_datos_basicos() -> rx.Component:
                     on_change=EmpleadosState.set_id_field,
                     placeholder="0000000000",
                     class_name="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all bg-white font-mono",
-                    default_value=EmpleadosState.selected_employee["id"].to(str),
+                    default_value=EmpleadosState.id_input,
                 ),
                 class_name="w-full",
             ),

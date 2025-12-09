@@ -86,6 +86,12 @@ class EmpleadosState(DatabaseState):
     label_attr_texto: str = "Atributo Texto"
     is_email_editable: bool = False
     editing_employee_id: int = 0
+    id_input: str = ""
+
+    @rx.var
+    def formatted_id(self) -> str:
+        """Return the ID padded with zeros to 10 digits."""
+        return f"{self.selected_employee['id']:010d}"
 
     @rx.var
     def masked_email(self) -> str:
@@ -167,21 +173,20 @@ class EmpleadosState(DatabaseState):
 
     @rx.event
     def set_id_field(self, value: str):
-        """Set ID ensuring it is numeric and max 10 digits."""
-        if not value:
-            self.selected_employee["id"] = 0
-            return
-        sanitized = "".join(filter(str.isdigit, value))
-        if len(sanitized) > 10:
-            sanitized = sanitized[:10]
-        if sanitized:
-            self.selected_employee["id"] = int(sanitized)
+        """Set ID ensuring it is numeric and max 10 digits, storing raw input."""
+        digits = "".join(filter(str.isdigit, value))
+        if len(digits) > 10:
+            digits = digits[:10]
+        self.id_input = digits
+        if digits:
+            self.selected_employee["id"] = int(digits)
         else:
             self.selected_employee["id"] = 0
 
     @rx.event
     def new_employee(self):
         self.editing_employee_id = 0
+        self.id_input = ""
         self.selected_employee = {
             "id": 0,
             "cedula": "",
@@ -212,6 +217,7 @@ class EmpleadosState(DatabaseState):
     def select_employee(self, employee: Employee):
         self.editing_employee_id = employee["id"]
         self.selected_employee = employee.copy()
+        self.id_input = f"{employee['id']:010d}"
         self.is_editing = True
         self.is_email_editable = False
 
@@ -361,6 +367,8 @@ class EmpleadosState(DatabaseState):
     @rx.event
     async def save_employee(self):
         emp = self.selected_employee
+        if not self.id_input:
+            return rx.toast.error("El ID es obligatorio y debe ser numérico.")
         if not emp["nombres"] or not emp["apellidos"] or (not emp["cedula"]):
             return rx.toast.error("Nombres, Apellidos y Cédula son obligatorios.")
         from app.states.base_state import BaseState
@@ -371,23 +379,16 @@ class EmpleadosState(DatabaseState):
         if len(pwd_val) != 64:
             pwd_val = hashlib.sha256(pwd_val.encode()).hexdigest()
         try:
-            new_id = int(emp["id"])
+            new_id = int(self.id_input)
             if self.editing_employee_id == 0:
-                if new_id == 0:
-                    max_id_query = "SELECT COALESCE(MAX(id), 0) + 1 as next_id FROM public.empleados"
-                    max_id_res = await self._execute_query(
-                        max_id_query, target_db="novalink"
+                check_query = "SELECT 1 FROM public.empleados WHERE id = :id"
+                exists_res = await self._execute_query(
+                    check_query, {"id": new_id}, target_db="novalink"
+                )
+                if exists_res:
+                    return rx.toast.error(
+                        f"El ID {new_id} ya existe. Por favor use otro."
                     )
-                    new_id = max_id_res[0]["next_id"] if max_id_res else 1
-                else:
-                    check_query = "SELECT 1 FROM public.empleados WHERE id = :id"
-                    exists_res = await self._execute_query(
-                        check_query, {"id": new_id}, target_db="novalink"
-                    )
-                    if exists_res:
-                        return rx.toast.error(
-                            f"El ID {new_id} ya existe. Por favor use otro o deje en 0 para automático."
-                        )
                 query = """
                     INSERT INTO public.empleados (
                         id, cedula, nombres, apellidos, correoelectronico,
@@ -433,8 +434,6 @@ class EmpleadosState(DatabaseState):
             else:
                 original_id = self.editing_employee_id
                 if new_id != original_id:
-                    if new_id == 0:
-                        return rx.toast.error("El ID no puede ser 0.")
                     check_query = "SELECT 1 FROM public.empleados WHERE id = :id AND id != :old_id"
                     exists_res = await self._execute_query(
                         check_query,
