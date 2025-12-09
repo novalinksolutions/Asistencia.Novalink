@@ -13,6 +13,7 @@ class Employee(TypedDict):
     apellidos: str
     correoelectronico: str
     telefono: str
+    direccion: str
     ganarecargonocturno: bool
     ganasobretiempo: bool
     stconautorizacion: bool
@@ -48,6 +49,7 @@ class EmpleadosState(DatabaseState):
         "apellidos": "",
         "correoelectronico": "",
         "telefono": "",
+        "direccion": "",
         "ganarecargonocturno": False,
         "ganasobretiempo": False,
         "stconautorizacion": False,
@@ -206,6 +208,7 @@ class EmpleadosState(DatabaseState):
             "apellidos": "",
             "correoelectronico": "",
             "telefono": "",
+            "direccion": "",
             "ganarecargonocturno": False,
             "ganasobretiempo": False,
             "stconautorizacion": False,
@@ -284,6 +287,8 @@ class EmpleadosState(DatabaseState):
             await self._execute_write(alter_query, target_db="novalink")
             alter_query_tel = "ALTER TABLE public.empleados ADD COLUMN IF NOT EXISTS telefono VARCHAR(20)"
             await self._execute_write(alter_query_tel, target_db="novalink")
+            alter_query_dir = "ALTER TABLE public.empleados ADD COLUMN IF NOT EXISTS direccion VARCHAR(200)"
+            await self._execute_write(alter_query_dir, target_db="novalink")
         except Exception as e:
             logging.exception(f"Error ensuring empleados table: {e}")
 
@@ -346,7 +351,7 @@ class EmpleadosState(DatabaseState):
         try:
             query = """
                 SELECT 
-                    id, cedula, codigoalterno, nombres, apellidos, correoelectronico, telefono,
+                    id, cedula, codigoalterno, nombres, apellidos, correoelectronico, telefono, direccion,
                     ganarecargonocturno, ganasobretiempo, stconautorizacion,
                     ganarecargodialibre, offline,
                     niveladm1, niveladm2, niveladm3, niveladm4, niveladm5,
@@ -365,6 +370,7 @@ class EmpleadosState(DatabaseState):
                     apellidos=row["apellidos"] or "",
                     correoelectronico=row["correoelectronico"] or "",
                     telefono=row["telefono"] or "",
+                    direccion=row.get("direccion") or "",
                     ganarecargonocturno=bool(row["ganarecargonocturno"]),
                     ganasobretiempo=bool(row["ganasobretiempo"]),
                     stconautorizacion=bool(row["stconautorizacion"]),
@@ -417,13 +423,13 @@ class EmpleadosState(DatabaseState):
                     )
                 query = """
                     INSERT INTO public.empleados (
-                        id, cedula, codigoalterno, nombres, apellidos, correoelectronico, telefono,
+                        id, cedula, codigoalterno, nombres, apellidos, correoelectronico, telefono, direccion,
                         ganarecargonocturno, ganasobretiempo, stconautorizacion, ganarecargodialibre, offline,
                         niveladm1, niveladm2, niveladm3, niveladm4, niveladm5,
                         cargo, tipo, grupo, atributotabular, atributotexto,
                         accesoweb, pwd, activo, fechacreacion, usuariocrea)
                     VALUES (
-                        :id, :cedula, :cod_alt, :nombres, :apellidos, :email, :telefono,
+                        :id, :cedula, :cod_alt, :nombres, :apellidos, :email, :telefono, :direccion,
                         :grn, :gst, :ast, :rel, :app,
                         :n1, :n2, :n3, :n4, :n5,
                         :cc, :cte, :grp, :cat, :atxt,
@@ -438,6 +444,7 @@ class EmpleadosState(DatabaseState):
                     "apellidos": emp["apellidos"],
                     "email": emp["correoelectronico"],
                     "telefono": emp.get("telefono", ""),
+                    "direccion": emp.get("direccion", ""),
                     "grn": emp["ganarecargonocturno"],
                     "gst": emp["ganasobretiempo"],
                     "ast": emp["stconautorizacion"],
@@ -476,7 +483,7 @@ class EmpleadosState(DatabaseState):
                 query = """
                     UPDATE public.empleados SET
                         id = :new_id,
-                        cedula = :cedula, codigoalterno = :cod_alt, nombres = :nombres, apellidos = :apellidos, correoelectronico = :email, telefono = :telefono,
+                        cedula = :cedula, codigoalterno = :cod_alt, nombres = :nombres, apellidos = :apellidos, correoelectronico = :email, telefono = :telefono, direccion = :direccion,
                         ganarecargonocturno = :grn, ganasobretiempo = :gst, stconautorizacion = :ast, ganarecargodialibre = :rel, offline = :app,
                         niveladm1 = :n1, niveladm2 = :n2, niveladm3 = :n3, niveladm4 = :n4, niveladm5 = :n5,
                         cargo = :cc, tipo = :cte, grupo = :grp, atributotabular = :cat, atributotexto = :atxt,
@@ -492,6 +499,7 @@ class EmpleadosState(DatabaseState):
                     "apellidos": emp["apellidos"],
                     "email": emp["correoelectronico"],
                     "telefono": emp.get("telefono", ""),
+                    "direccion": emp.get("direccion", ""),
                     "grn": emp["ganarecargonocturno"],
                     "gst": emp["ganasobretiempo"],
                     "ast": emp["stconautorizacion"],
