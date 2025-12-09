@@ -166,6 +166,20 @@ class EmpleadosState(DatabaseState):
         self.selected_employee[field] = checked
 
     @rx.event
+    def set_id_field(self, value: str):
+        """Set ID ensuring it is numeric and max 10 digits."""
+        if not value:
+            self.selected_employee["id"] = 0
+            return
+        sanitized = "".join(filter(str.isdigit, value))
+        if len(sanitized) > 10:
+            sanitized = sanitized[:10]
+        if sanitized:
+            self.selected_employee["id"] = int(sanitized)
+        else:
+            self.selected_employee["id"] = 0
+
+    @rx.event
     def new_employee(self):
         self.editing_employee_id = 0
         self.selected_employee = {
@@ -357,15 +371,23 @@ class EmpleadosState(DatabaseState):
         if len(pwd_val) != 64:
             pwd_val = hashlib.sha256(pwd_val.encode()).hexdigest()
         try:
+            new_id = int(emp["id"])
             if self.editing_employee_id == 0:
-                max_id_query = (
-                    "SELECT COALESCE(MAX(id), 0) + 1 as next_id FROM public.empleados"
-                )
-                max_id_res = await self._execute_query(
-                    max_id_query, target_db="novalink"
-                )
-                new_id = max_id_res[0]["next_id"] if max_id_res else 1
-                self.selected_employee["id"] = new_id
+                if new_id == 0:
+                    max_id_query = "SELECT COALESCE(MAX(id), 0) + 1 as next_id FROM public.empleados"
+                    max_id_res = await self._execute_query(
+                        max_id_query, target_db="novalink"
+                    )
+                    new_id = max_id_res[0]["next_id"] if max_id_res else 1
+                else:
+                    check_query = "SELECT 1 FROM public.empleados WHERE id = :id"
+                    exists_res = await self._execute_query(
+                        check_query, {"id": new_id}, target_db="novalink"
+                    )
+                    if exists_res:
+                        return rx.toast.error(
+                            f"El ID {new_id} ya existe. Por favor use otro o deje en 0 para automático."
+                        )
                 query = """
                     INSERT INTO public.empleados (
                         id, cedula, nombres, apellidos, correoelectronico,
@@ -407,19 +429,35 @@ class EmpleadosState(DatabaseState):
                     "uid": user_id,
                 }
                 await self._execute_write(query, params, target_db="novalink")
-                rx.toast.success("Empleado creado correctamente")
+                rx.toast.success(f"Empleado creado con ID {new_id}")
             else:
+                original_id = self.editing_employee_id
+                if new_id != original_id:
+                    if new_id == 0:
+                        return rx.toast.error("El ID no puede ser 0.")
+                    check_query = "SELECT 1 FROM public.empleados WHERE id = :id AND id != :old_id"
+                    exists_res = await self._execute_query(
+                        check_query,
+                        {"id": new_id, "old_id": original_id},
+                        target_db="novalink",
+                    )
+                    if exists_res:
+                        return rx.toast.error(
+                            f"El ID {new_id} ya está en uso por otro empleado."
+                        )
                 query = """
                     UPDATE public.empleados SET
+                        id = :new_id,
                         cedula = :cedula, nombres = :nombres, apellidos = :apellidos, correoelectronico = :email,
                         ganarecargonocturno = :grn, ganasobretiempo = :gst, stconautorizacion = :ast, ganarecargodialibre = :rel, offline = :app,
                         niveladm1 = :n1, niveladm2 = :n2, niveladm3 = :n3, niveladm4 = :n4, niveladm5 = :n5,
                         cargo = :cc, tipo = :cte, atributotabular = :cat, atributotexto = :atxt,
                         accesoweb = :web, pwd = :pwd, activo = :activo, fechamodificacion = NOW(), usuariomodifica = :uid
-                    WHERE id = :id
+                    WHERE id = :old_id
                 """
                 params = {
-                    "id": emp["id"],
+                    "new_id": new_id,
+                    "old_id": original_id,
                     "cedula": emp["cedula"],
                     "nombres": emp["nombres"],
                     "apellidos": emp["apellidos"],

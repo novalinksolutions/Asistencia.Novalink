@@ -95,10 +95,19 @@ def form_select(
 def tab_datos_basicos() -> rx.Component:
     return rx.el.div(
         rx.el.div(
-            rx.cond(
-                EmpleadosState.editing_employee_id != 0,
-                form_input("ID Sistema", "id", read_only=True),
-                None,
+            rx.el.div(
+                rx.el.label(
+                    "ID Sistema",
+                    class_name="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1",
+                ),
+                rx.el.input(
+                    type="text",
+                    on_change=EmpleadosState.set_id_field,
+                    placeholder="0000000000",
+                    class_name="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all bg-white font-mono",
+                    default_value=EmpleadosState.selected_employee["id"].to(str),
+                ),
+                class_name="w-full",
             ),
             form_input("Cédula", "cedula", placeholder="0000000000"),
             class_name="grid grid-cols-2 gap-4 mb-4",
