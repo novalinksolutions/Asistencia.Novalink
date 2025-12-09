@@ -309,9 +309,33 @@ class EmpleadosState(DatabaseState):
     @rx.event
     async def on_load(self):
         await self._ensure_tables()
+        await self._drop_fk_constraints()
         await self.load_config()
         await self.load_catalogs()
         await self.load_employees()
+
+    async def _drop_fk_constraints(self):
+        """Drop foreign key constraints to allow saving with default values (0)."""
+        if not self.has_db_connection:
+            return
+        try:
+            query_find = """
+                SELECT constraint_name 
+                FROM information_schema.table_constraints 
+                WHERE table_name = 'empleados' 
+                AND constraint_type = 'FOREIGN KEY' 
+                AND table_schema = 'public'
+            """
+            results = await self._execute_query(query_find, target_db="novalink")
+            for row in results:
+                constraint = row["constraint_name"]
+                logging.info(f"Dropping FK constraint: {constraint}")
+                drop_query = (
+                    f'ALTER TABLE public.empleados DROP CONSTRAINT "{constraint}"'
+                )
+                await self._execute_write(drop_query, target_db="novalink")
+        except Exception as e:
+            logging.exception(f"Error dropping foreign keys: {e}")
 
     @rx.event
     async def load_config(self):
@@ -420,10 +444,17 @@ class EmpleadosState(DatabaseState):
     @rx.event
     async def save_employee(self):
         emp = self.selected_employee
+        validation_errors = []
         if not self.id_input:
-            return rx.toast.error("El ID es obligatorio y debe ser numérico.")
-        if not emp["nombres"] or not emp["apellidos"] or (not emp["cedula"]):
-            return rx.toast.error("Nombres, Apellidos y Cédula son obligatorios.")
+            validation_errors.append("El ID es obligatorio")
+        if not emp["cedula"] or not emp["cedula"].strip():
+            validation_errors.append("La Cédula es obligatoria")
+        if not emp["nombres"] or not emp["nombres"].strip():
+            validation_errors.append("Los Nombres son obligatorios")
+        if not emp["apellidos"] or not emp["apellidos"].strip():
+            validation_errors.append("Los Apellidos son obligatorios")
+        if validation_errors:
+            return rx.toast.error(f"Validación: {', '.join(validation_errors)}.")
         from app.states.base_state import BaseState
 
         base_state = await self.get_state(BaseState)
