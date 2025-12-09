@@ -171,8 +171,11 @@ class EmpleadosState(DatabaseState):
         if not value:
             self.selected_employee["id"] = 0
             return
-        if value.isdigit() and len(value) <= 10:
-            self.selected_employee["id"] = int(value)
+        numeric_value = "".join(filter(str.isdigit, value))
+        if len(numeric_value) > 10:
+            numeric_value = numeric_value[:10]
+        if numeric_value:
+            self.selected_employee["id"] = int(numeric_value)
 
     @rx.event
     def new_employee(self):
@@ -367,18 +370,23 @@ class EmpleadosState(DatabaseState):
             pwd_val = hashlib.sha256(pwd_val.encode()).hexdigest()
         try:
             if self.editing_employee_id == 0:
-                new_id = emp["id"]
-                if new_id == 0 or len(new_id) != 10:
-                    return rx.toast.error(
-                        "El ID es obligatorio y debe tener exactamente 10 dígitos numéricos."
-                    )
+                raw_id = str(emp["id"])
+                if raw_id == "0" or not raw_id:
+                    return rx.toast.error("El ID es obligatorio.")
+                padded_id_str = raw_id.zfill(10)
+                if not padded_id_str.isdigit():
+                    return rx.toast.error("El ID debe contener solo números.")
+                if len(padded_id_str) != 10:
+                    return rx.toast.error("El ID debe tener máximo 10 dígitos.")
+                new_id = int(padded_id_str)
+                self.selected_employee["id"] = new_id
                 exists_query = "SELECT 1 FROM public.empleados WHERE id = :id"
                 exists = await self._execute_query(
                     exists_query, {"id": new_id}, target_db="novalink"
                 )
                 if exists:
                     return rx.toast.error(
-                        f"El ID {new_id} ya está registrado en el sistema."
+                        f"El ID {padded_id_str} ya está registrado en el sistema."
                     )
                 query = """
                     INSERT INTO public.empleados (
