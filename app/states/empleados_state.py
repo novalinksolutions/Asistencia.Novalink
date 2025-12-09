@@ -34,6 +34,7 @@ class Employee(TypedDict):
     accesoweb: bool
     pwd: str
     activo: bool
+    nivelautorizacion: int
 
 
 class CatalogItem(TypedDict):
@@ -72,6 +73,7 @@ class EmpleadosState(DatabaseState):
         "accesoweb": False,
         "pwd": "12345678",
         "activo": True,
+        "nivelautorizacion": 0,
     }
     cat_nivel1: list[CatalogItem] = []
     cat_nivel2: list[CatalogItem] = []
@@ -229,6 +231,7 @@ class EmpleadosState(DatabaseState):
             "accesoweb": False,
             "pwd": "12345678",
             "activo": True,
+            "nivelautorizacion": 0,
         }
         self.is_email_editable = True
         self.is_editing = True
@@ -294,6 +297,12 @@ class EmpleadosState(DatabaseState):
             await self._execute_write(alter_query_tel, target_db="novalink")
             alter_query_dir = "ALTER TABLE public.empleados ADD COLUMN IF NOT EXISTS direccion VARCHAR(200)"
             await self._execute_write(alter_query_dir, target_db="novalink")
+            alter_query_auth = "ALTER TABLE public.empleados ADD COLUMN IF NOT EXISTS nivelautorizacion SMALLINT DEFAULT 0"
+            await self._execute_write(alter_query_auth, target_db="novalink")
+            fix_nulls_query = "UPDATE public.empleados SET nivelautorizacion = 0 WHERE nivelautorizacion IS NULL"
+            await self._execute_write(fix_nulls_query, target_db="novalink")
+            force_default_query = "ALTER TABLE public.empleados ALTER COLUMN nivelautorizacion SET DEFAULT 0"
+            await self._execute_write(force_default_query, target_db="novalink")
         except Exception as e:
             logging.exception(f"Error ensuring empleados table: {e}")
 
@@ -364,7 +373,8 @@ class EmpleadosState(DatabaseState):
                     ganarecargodialibre, offline,
                     niveladm1, niveladm2, niveladm3, niveladm4, niveladm5,
                     cargo, tipo, grupo, atributotabular, atributotexto,
-                    accesoweb, pwd, activo
+                    accesoweb, pwd, activo,
+                    COALESCE(nivelautorizacion, 0) as nivelautorizacion
                 FROM public.empleados
                 ORDER BY apellidos, nombres
             """
@@ -399,6 +409,7 @@ class EmpleadosState(DatabaseState):
                     accesoweb=bool(row["accesoweb"]),
                     pwd=row["pwd"] or "",
                     activo=bool(row["activo"]),
+                    nivelautorizacion=row.get("nivelautorizacion") or 0,
                 )
                 for row in results
             ]
@@ -438,7 +449,7 @@ class EmpleadosState(DatabaseState):
                         ganarecargonocturno, ganasobretiempo, stconautorizacion, ganarecargodialibre, offline,
                         niveladm1, niveladm2, niveladm3, niveladm4, niveladm5,
                         cargo, tipo, grupo, atributotabular, atributotexto,
-                        accesoweb, pwd, activo, fechacreacion, usuariocrea, usuario)
+                        accesoweb, pwd, activo, fechacreacion, usuariocrea, usuario, nivelautorizacion)
                     VALUES (
                         :id, :cedula, :nombres, :apellidos, :email,
                         :transporte, :alimentacion, :zona, 
@@ -447,7 +458,7 @@ class EmpleadosState(DatabaseState):
                         :grn, :gst, :ast, :rel, :app,
                         :n1, :n2, :n3, :n4, :n5,
                         :cc, :cte, :grp, :cat, :atxt,
-                        :web, :pwd, :activo, NOW(), :uid, :uid
+                        :web, :pwd, :activo, NOW(), :uid, :uid, :nauth
                     )
                 """
                 params = {
@@ -480,6 +491,7 @@ class EmpleadosState(DatabaseState):
                     "pwd": pwd_val,
                     "activo": emp["activo"],
                     "uid": user_id,
+                    "nauth": emp.get("nivelautorizacion") or 0,
                 }
                 await self._execute_write(query, params, target_db="novalink")
                 rx.toast.success(f"Empleado creado con ID {new_id}")
@@ -506,7 +518,8 @@ class EmpleadosState(DatabaseState):
                         ganarecargonocturno = :grn, ganasobretiempo = :gst, stconautorizacion = :ast, ganarecargodialibre = :rel, offline = :app,
                         niveladm1 = :n1, niveladm2 = :n2, niveladm3 = :n3, niveladm4 = :n4, niveladm5 = :n5,
                         cargo = :cc, tipo = :cte, grupo = :grp, atributotabular = :cat, atributotexto = :atxt,
-                        accesoweb = :web, pwd = :pwd, activo = :activo, fechamodificacion = NOW(), usuariomodifica = :uid
+                        accesoweb = :web, pwd = :pwd, activo = :activo, fechamodificacion = NOW(), usuariomodifica = :uid,
+                        nivelautorizacion = :nauth
                     WHERE id = :old_id
                 """
                 params = {
@@ -540,6 +553,7 @@ class EmpleadosState(DatabaseState):
                     "pwd": pwd_val,
                     "activo": emp["activo"],
                     "uid": user_id,
+                    "nauth": emp.get("nivelautorizacion") or 0,
                 }
                 await self._execute_write(query, params, target_db="novalink")
                 rx.toast.success("Empleado actualizado correctamente")
