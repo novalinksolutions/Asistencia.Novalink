@@ -8,12 +8,14 @@ from app.states.database_state import DatabaseState
 class Employee(TypedDict):
     id: int
     cedula: str
-    codigoalterno: str
     nombres: str
     apellidos: str
     correoelectronico: str
-    telefono: str
-    direccion: str
+    transporte: bool
+    alimentacion: bool
+    zona: int
+    fechacalculovacaciones: str
+    fechaingreso: str
     ganarecargonocturno: bool
     ganasobretiempo: bool
     stconautorizacion: bool
@@ -44,12 +46,14 @@ class EmpleadosState(DatabaseState):
     selected_employee: Employee = {
         "id": 0,
         "cedula": "",
-        "codigoalterno": "",
         "nombres": "",
         "apellidos": "",
         "correoelectronico": "",
-        "telefono": "",
-        "direccion": "",
+        "transporte": False,
+        "alimentacion": False,
+        "zona": 0,
+        "fechacalculovacaciones": "",
+        "fechaingreso": "",
         "ganarecargonocturno": False,
         "ganasobretiempo": False,
         "stconautorizacion": False,
@@ -170,10 +174,6 @@ class EmpleadosState(DatabaseState):
         self.selected_employee[field] = value
 
     @rx.event
-    def set_telefono(self, value: str):
-        self.selected_employee["telefono"] = value
-
-    @rx.event
     def set_int_field(self, field: str, value: str):
         try:
             self.selected_employee[field] = int(value)
@@ -203,12 +203,14 @@ class EmpleadosState(DatabaseState):
         self.selected_employee = {
             "id": 0,
             "cedula": "",
-            "codigoalterno": "",
             "nombres": "",
             "apellidos": "",
             "correoelectronico": "",
-            "telefono": "",
-            "direccion": "",
+            "transporte": False,
+            "alimentacion": False,
+            "zona": 0,
+            "fechacalculovacaciones": "",
+            "fechaingreso": "",
             "ganarecargonocturno": False,
             "ganasobretiempo": False,
             "stconautorizacion": False,
@@ -351,7 +353,10 @@ class EmpleadosState(DatabaseState):
         try:
             query = """
                 SELECT 
-                    id, cedula, codigoalterno, nombres, apellidos, correoelectronico, telefono, direccion,
+                    id, cedula, nombres, apellidos, correoelectronico,
+                    transporte, alimentacion, zona,
+                    COALESCE(to_char(fechacalculovacaciones, 'YYYY-MM-DD'), '') as fechacalculovacaciones,
+                    COALESCE(to_char(fechaingreso, 'YYYY-MM-DD'), '') as fechaingreso,
                     ganarecargonocturno, ganasobretiempo, stconautorizacion,
                     ganarecargodialibre, offline,
                     niveladm1, niveladm2, niveladm3, niveladm4, niveladm5,
@@ -365,12 +370,14 @@ class EmpleadosState(DatabaseState):
                 Employee(
                     id=row["id"],
                     cedula=row["cedula"] or "",
-                    codigoalterno=row["codigoalterno"] or "",
                     nombres=row["nombres"] or "",
                     apellidos=row["apellidos"] or "",
                     correoelectronico=row["correoelectronico"] or "",
-                    telefono=row["telefono"] or "",
-                    direccion=row.get("direccion") or "",
+                    transporte=bool(row.get("transporte", False)),
+                    alimentacion=bool(row.get("alimentacion", False)),
+                    zona=row.get("zona") or 0,
+                    fechacalculovacaciones=row["fechacalculovacaciones"],
+                    fechaingreso=row["fechaingreso"],
                     ganarecargonocturno=bool(row["ganarecargonocturno"]),
                     ganasobretiempo=bool(row["ganasobretiempo"]),
                     stconautorizacion=bool(row["stconautorizacion"]),
@@ -423,13 +430,17 @@ class EmpleadosState(DatabaseState):
                     )
                 query = """
                     INSERT INTO public.empleados (
-                        id, cedula, codigoalterno, nombres, apellidos, correoelectronico, telefono, direccion,
+                        id, cedula, nombres, apellidos, correoelectronico,
+                        transporte, alimentacion, zona, fechacalculovacaciones, fechaingreso,
                         ganarecargonocturno, ganasobretiempo, stconautorizacion, ganarecargodialibre, offline,
                         niveladm1, niveladm2, niveladm3, niveladm4, niveladm5,
                         cargo, tipo, grupo, atributotabular, atributotexto,
                         accesoweb, pwd, activo, fechacreacion, usuariocrea)
                     VALUES (
-                        :id, :cedula, :cod_alt, :nombres, :apellidos, :email, :telefono, :direccion,
+                        :id, :cedula, :nombres, :apellidos, :email,
+                        :transporte, :alimentacion, :zona, 
+                        COALESCE(NULLIF(:f_vac, '')::date, CURRENT_DATE), 
+                        COALESCE(NULLIF(:f_ing, '')::date, CURRENT_DATE),
                         :grn, :gst, :ast, :rel, :app,
                         :n1, :n2, :n3, :n4, :n5,
                         :cc, :cte, :grp, :cat, :atxt,
@@ -439,12 +450,14 @@ class EmpleadosState(DatabaseState):
                 params = {
                     "id": new_id,
                     "cedula": emp["cedula"],
-                    "cod_alt": emp.get("codigoalterno", ""),
                     "nombres": emp["nombres"],
                     "apellidos": emp["apellidos"],
                     "email": emp["correoelectronico"],
-                    "telefono": emp.get("telefono", ""),
-                    "direccion": emp.get("direccion", ""),
+                    "transporte": emp.get("transporte", False),
+                    "alimentacion": emp.get("alimentacion", False),
+                    "zona": emp.get("zona", 0),
+                    "f_vac": emp.get("fechacalculovacaciones", ""),
+                    "f_ing": emp.get("fechaingreso", ""),
                     "grn": emp["ganarecargonocturno"],
                     "gst": emp["ganasobretiempo"],
                     "ast": emp["stconautorizacion"],
@@ -483,7 +496,10 @@ class EmpleadosState(DatabaseState):
                 query = """
                     UPDATE public.empleados SET
                         id = :new_id,
-                        cedula = :cedula, codigoalterno = :cod_alt, nombres = :nombres, apellidos = :apellidos, correoelectronico = :email, telefono = :telefono, direccion = :direccion,
+                        cedula = :cedula, nombres = :nombres, apellidos = :apellidos, correoelectronico = :email,
+                        transporte = :transporte, alimentacion = :alimentacion, zona = :zona, 
+                        fechacalculovacaciones = COALESCE(NULLIF(:f_vac, '')::date, CURRENT_DATE), 
+                        fechaingreso = COALESCE(NULLIF(:f_ing, '')::date, CURRENT_DATE),
                         ganarecargonocturno = :grn, ganasobretiempo = :gst, stconautorizacion = :ast, ganarecargodialibre = :rel, offline = :app,
                         niveladm1 = :n1, niveladm2 = :n2, niveladm3 = :n3, niveladm4 = :n4, niveladm5 = :n5,
                         cargo = :cc, tipo = :cte, grupo = :grp, atributotabular = :cat, atributotexto = :atxt,
@@ -494,12 +510,14 @@ class EmpleadosState(DatabaseState):
                     "new_id": new_id,
                     "old_id": original_id,
                     "cedula": emp["cedula"],
-                    "cod_alt": emp.get("codigoalterno", ""),
                     "nombres": emp["nombres"],
                     "apellidos": emp["apellidos"],
                     "email": emp["correoelectronico"],
-                    "telefono": emp.get("telefono", ""),
-                    "direccion": emp.get("direccion", ""),
+                    "transporte": emp.get("transporte", False),
+                    "alimentacion": emp.get("alimentacion", False),
+                    "zona": emp.get("zona", 0),
+                    "f_vac": emp.get("fechacalculovacaciones", ""),
+                    "f_ing": emp.get("fechaingreso", ""),
                     "grn": emp["ganarecargonocturno"],
                     "gst": emp["ganasobretiempo"],
                     "ast": emp["stconautorizacion"],
@@ -512,6 +530,7 @@ class EmpleadosState(DatabaseState):
                     "n5": emp["niveladm5"],
                     "cc": emp["cargo"],
                     "cte": emp["tipo"],
+                    "grp": emp.get("grupo", 0),
                     "cat": emp["atributotabular"],
                     "atxt": emp["atributotexto"],
                     "web": emp["accesoweb"],
