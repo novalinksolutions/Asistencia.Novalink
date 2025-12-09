@@ -279,12 +279,15 @@ class EmpleadosState(DatabaseState):
                     pwd TEXT,
                     activo BOOLEAN DEFAULT true,
                     fechacreacion TIMESTAMP DEFAULT NOW(),
-                    usuariocrea BIGINT,
+                    usuario BIGINT DEFAULT 1,
+                    usuariocrea BIGINT DEFAULT 1,
                     fechamodificacion TIMESTAMP,
                     usuariomodifica BIGINT
                 )
             """
             await self._execute_write(query, target_db="novalink")
+            alter_query_usr = "ALTER TABLE public.empleados ADD COLUMN IF NOT EXISTS usuario BIGINT DEFAULT 1"
+            await self._execute_write(alter_query_usr, target_db="novalink")
             alter_query = "ALTER TABLE public.empleados ADD COLUMN IF NOT EXISTS grupo BIGINT DEFAULT 0"
             await self._execute_write(alter_query, target_db="novalink")
             alter_query_tel = "ALTER TABLE public.empleados ADD COLUMN IF NOT EXISTS telefono VARCHAR(20)"
@@ -435,7 +438,7 @@ class EmpleadosState(DatabaseState):
                         ganarecargonocturno, ganasobretiempo, stconautorizacion, ganarecargodialibre, offline,
                         niveladm1, niveladm2, niveladm3, niveladm4, niveladm5,
                         cargo, tipo, grupo, atributotabular, atributotexto,
-                        accesoweb, pwd, activo, fechacreacion, usuariocrea)
+                        accesoweb, pwd, activo, fechacreacion, usuariocrea, usuario)
                     VALUES (
                         :id, :cedula, :nombres, :apellidos, :email,
                         :transporte, :alimentacion, :zona, 
@@ -444,7 +447,7 @@ class EmpleadosState(DatabaseState):
                         :grn, :gst, :ast, :rel, :app,
                         :n1, :n2, :n3, :n4, :n5,
                         :cc, :cte, :grp, :cat, :atxt,
-                        :web, :pwd, :activo, NOW(), :uid
+                        :web, :pwd, :activo, NOW(), :uid, :uid
                     )
                 """
                 params = {
