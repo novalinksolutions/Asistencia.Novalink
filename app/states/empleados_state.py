@@ -70,6 +70,7 @@ class EmpleadosState(DatabaseState):
     cat_tipos: list[CatalogItem] = []
     cat_attr_tabular: list[CatalogItem] = []
     search_query: str = ""
+    temp_id: str = ""
     show_inactive: bool = False
     is_editing: bool = False
     niveles_habilitados: int = 5
@@ -115,12 +116,6 @@ class EmpleadosState(DatabaseState):
     @rx.event
     def toggle_email_editable(self):
         self.is_email_editable = not self.is_email_editable
-
-    @rx.var
-    def id_display_value(self) -> str:
-        """Display value for the ID input."""
-        val = self.selected_employee["id"]
-        return "" if val == 0 else str(val)
 
     @rx.var
     def filtered_employees(self) -> list[Employee]:
@@ -177,6 +172,7 @@ class EmpleadosState(DatabaseState):
         numeric_value = "".join(filter(str.isdigit, value))
         if len(numeric_value) > 10:
             numeric_value = numeric_value[:10]
+        self.temp_id = numeric_value
         if numeric_value:
             self.selected_employee["id"] = int(numeric_value)
         else:
@@ -209,12 +205,14 @@ class EmpleadosState(DatabaseState):
             "pwd": "12345678",
             "activo": True,
         }
+        self.temp_id = ""
         self.is_editing = True
 
     @rx.event
     def select_employee(self, employee: Employee):
         self.editing_employee_id = employee["id"]
         self.selected_employee = employee.copy()
+        self.temp_id = str(employee["id"])
         self.is_editing = True
         self.is_email_editable = False
 
