@@ -9,7 +9,7 @@ _engines_cache = {}
 CLOUD_DB_HOST = "86.48.22.167"
 CLOUD_DB_PORT = "5432"
 CLOUD_DB_USER = "novalink"
-CLOUD_DB_PASS = "Nov@link04$"
+CLOUD_DB_PASS = "Novalink04"
 CLOUD_BASE_URL = f"postgresql://{CLOUD_DB_USER}:{quote_plus(CLOUD_DB_PASS)}@{CLOUD_DB_HOST}:{CLOUD_DB_PORT}/serviciosdev"
 
 
