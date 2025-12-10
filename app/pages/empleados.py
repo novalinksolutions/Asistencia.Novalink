@@ -466,6 +466,15 @@ def empleados_page() -> rx.Component:
                         ),
                         class_name="flex justify-between items-center mb-4",
                     ),
+                    rx.cond(
+                        EmpleadosState.search_query.length() < 3,
+                        rx.el.div(
+                            rx.icon("clock", class_name="w-3 h-3 mr-1"),
+                            "Últimos 10 modificados (7 días)",
+                            class_name="flex items-center text-xs text-gray-400 font-medium mb-2 pl-1 uppercase tracking-wider",
+                        ),
+                        None,
+                    ),
                     rx.el.div(
                         rx.foreach(
                             EmpleadosState.filtered_employees, employee_list_item

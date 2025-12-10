@@ -2,6 +2,7 @@ import reflex as rx
 from typing import TypedDict, Any, Optional
 import logging
 import hashlib
+import datetime
 from app.states.database_state import DatabaseState
 
 
@@ -35,6 +36,8 @@ class Employee(TypedDict):
     pwd: str
     activo: bool
     nivelautorizacion: int
+    fechacreacion: str
+    fechamodificacion: str
 
 
 class CatalogItem(TypedDict):
@@ -74,6 +77,8 @@ class EmpleadosState(DatabaseState):
         "pwd": "12345678",
         "activo": True,
         "nivelautorizacion": 0,
+        "fechacreacion": "",
+        "fechamodificacion": "",
     }
     cat_nivel1: list[CatalogItem] = []
     cat_nivel2: list[CatalogItem] = []
@@ -138,9 +143,27 @@ class EmpleadosState(DatabaseState):
         self.is_email_editable = not self.is_email_editable
 
     @rx.var
+    def recent_employees(self) -> list[Employee]:
+        if not self.employees:
+            return []
+        cutoff = (datetime.datetime.now() - datetime.timedelta(days=7)).strftime(
+            "%Y-%m-%d %H:%M:%S"
+        )
+
+        @rx.event
+        def get_sort_date(e: Employee):
+            d1 = e.get("fechacreacion") or ""
+            d2 = e.get("fechamodificacion") or ""
+            return max(d1, d2)
+
+        recent = [e for e in self.employees if get_sort_date(e) >= cutoff]
+        recent.sort(key=get_sort_date, reverse=True)
+        return recent[:10]
+
+    @rx.var
     def filtered_employees(self) -> list[Employee]:
         if len(self.search_query) < 3:
-            return []
+            return self.recent_employees
         items = self.employees
         if not self.show_inactive:
             items = [e for e in items if e["activo"]]
@@ -233,6 +256,8 @@ class EmpleadosState(DatabaseState):
             "pwd": "12345678",
             "activo": True,
             "nivelautorizacion": 0,
+            "fechacreacion": "",
+            "fechamodificacion": "",
         }
         self.is_email_editable = True
         self.is_editing = True
@@ -438,7 +463,9 @@ class EmpleadosState(DatabaseState):
                     niveladm1, niveladm2, niveladm3, niveladm4, niveladm5,
                     cargo, tipo, grupo, atributotabular, atributotexto,
                     accesoweb, pwd, activo,
-                    COALESCE(nivelautorizacion, 0) as nivelautorizacion
+                    COALESCE(nivelautorizacion, 0) as nivelautorizacion,
+                    COALESCE(to_char(fechacreacion, 'YYYY-MM-DD HH24:MI:SS'), '') as fechacreacion,
+                    COALESCE(to_char(fechamodificacion, 'YYYY-MM-DD HH24:MI:SS'), '') as fechamodificacion
                 FROM public.empleados
                 ORDER BY apellidos, nombres
             """
@@ -474,6 +501,8 @@ class EmpleadosState(DatabaseState):
                     pwd=row["pwd"] or "",
                     activo=bool(row["activo"]),
                     nivelautorizacion=row.get("nivelautorizacion") or 0,
+                    fechacreacion=row["fechacreacion"],
+                    fechamodificacion=row["fechamodificacion"],
                 )
                 for row in results
             ]
