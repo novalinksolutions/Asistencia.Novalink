@@ -496,7 +496,8 @@ class EmpleadosState(DatabaseState):
         if not emp["apellidos"] or not emp["apellidos"].strip():
             validation_errors.append("Los Apellidos son obligatorios")
         if validation_errors:
-            return rx.toast.error(f"Validación: {', '.join(validation_errors)}.")
+            yield rx.toast.error(f"Validación: {', '.join(validation_errors)}.")
+            return
         from app.states.base_state import BaseState
 
         base_state = await self.get_state(BaseState)
@@ -512,9 +513,10 @@ class EmpleadosState(DatabaseState):
                     check_query, {"id": new_id}, target_db="novalink"
                 )
                 if exists_res:
-                    return rx.toast.error(
+                    yield rx.toast.error(
                         f"El ID {new_id} ya existe. Por favor use otro."
                     )
+                    return
                 query = """
                     INSERT INTO public.empleados (
                         id, cedula, nombres, apellidos, correoelectronico,
@@ -569,7 +571,7 @@ class EmpleadosState(DatabaseState):
                 await self._execute_write(query, params, target_db="novalink")
                 self.editing_employee_id = new_id
                 self.selected_employee["id"] = new_id
-                rx.toast.success(f"Empleado creado con ID {new_id}")
+                yield rx.toast.success(f"Empleado creado con ID {new_id}")
             else:
                 original_id = self.editing_employee_id
                 if new_id != original_id:
@@ -580,9 +582,10 @@ class EmpleadosState(DatabaseState):
                         target_db="novalink",
                     )
                     if exists_res:
-                        return rx.toast.error(
+                        yield rx.toast.error(
                             f"El ID {new_id} ya está en uso por otro empleado."
                         )
+                        return
                 query = """
                     UPDATE public.empleados SET
                         id = :new_id,
@@ -634,8 +637,8 @@ class EmpleadosState(DatabaseState):
                 if new_id != original_id:
                     self.editing_employee_id = new_id
                     self.selected_employee["id"] = new_id
-                rx.toast.success("Empleado actualizado correctamente")
+                yield rx.toast.success("Empleado actualizado correctamente")
             await self.load_employees()
         except Exception as e:
             logging.exception(f"Error saving employee: {e}")
-            rx.toast.error(f"Error al guardar: {e}")
+            yield rx.toast.error(f"Error al guardar: {e}")
