@@ -567,6 +567,8 @@ class EmpleadosState(DatabaseState):
                     "nauth": emp.get("nivelautorizacion") or 0,
                 }
                 await self._execute_write(query, params, target_db="novalink")
+                self.editing_employee_id = new_id
+                self.selected_employee["id"] = new_id
                 rx.toast.success(f"Empleado creado con ID {new_id}")
             else:
                 original_id = self.editing_employee_id
@@ -629,8 +631,10 @@ class EmpleadosState(DatabaseState):
                     "nauth": emp.get("nivelautorizacion") or 0,
                 }
                 await self._execute_write(query, params, target_db="novalink")
+                if new_id != original_id:
+                    self.editing_employee_id = new_id
+                    self.selected_employee["id"] = new_id
                 rx.toast.success("Empleado actualizado correctamente")
-            self.cancel_edit()
             await self.load_employees()
         except Exception as e:
             logging.exception(f"Error saving employee: {e}")
