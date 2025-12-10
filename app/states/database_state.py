@@ -6,10 +6,10 @@ import logging
 from urllib.parse import urlparse, urlunparse
 
 _engines_cache = {}
-CLOUD_DB_HOST = "144.126.154.99"
+CLOUD_DB_HOST = "86.48.22.167"
 CLOUD_DB_PORT = "5432"
-CLOUD_DB_USER = "techind"
-CLOUD_DB_PASS = "pgT3ch1nd2017*!"
+CLOUD_DB_USER = "novalink"
+CLOUD_DB_PASS = "Nov@link04$"
 CLOUD_BASE_URL = f"postgresql://{CLOUD_DB_USER}:{CLOUD_DB_PASS}@{CLOUD_DB_HOST}:{CLOUD_DB_PORT}/serviciosdev"
 
 
