@@ -8,8 +8,10 @@ def base_layout(content: rx.Component) -> rx.Component:
         sidebar(),
         rx.el.div(
             header(),
-            rx.el.main(content, class_name="flex-1 p-6 bg-background"),
-            class_name="flex flex-col flex-1",
+            rx.el.main(
+                content, class_name="flex-1 p-3 md:p-4 bg-background overflow-hidden"
+            ),
+            class_name="flex flex-col flex-1 h-screen overflow-hidden",
         ),
-        class_name="flex min-h-screen w-full bg-background",
+        class_name="flex h-screen w-full bg-background overflow-hidden",
     )
