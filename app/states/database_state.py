@@ -3,14 +3,14 @@ import os
 from sqlalchemy import create_engine, text
 from sqlalchemy.exc import ProgrammingError, OperationalError
 import logging
-from urllib.parse import urlparse, urlunparse
+from urllib.parse import urlparse, urlunparse, quote_plus
 
 _engines_cache = {}
 CLOUD_DB_HOST = "86.48.22.167"
 CLOUD_DB_PORT = "5432"
 CLOUD_DB_USER = "novalink"
 CLOUD_DB_PASS = "Nov@link04$"
-CLOUD_BASE_URL = f"postgresql://{CLOUD_DB_USER}:{CLOUD_DB_PASS}@{CLOUD_DB_HOST}:{CLOUD_DB_PORT}/serviciosdev"
+CLOUD_BASE_URL = f"postgresql://{CLOUD_DB_USER}:{quote_plus(CLOUD_DB_PASS)}@{CLOUD_DB_HOST}:{CLOUD_DB_PORT}/serviciosdev"
 
 
 class DatabaseState(rx.State):
