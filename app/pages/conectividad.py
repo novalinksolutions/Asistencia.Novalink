@@ -17,27 +17,27 @@ def dispositivo_row(dispositivo: dict) -> rx.Component:
     return rx.el.tr(
         rx.el.td(
             dispositivo["codigo"],
-            class_name="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900",
+            class_name="px-4 py-2 whitespace-nowrap text-xs font-medium text-gray-900",
         ),
         rx.el.td(
             dispositivo["descripcion"],
-            class_name="px-6 py-4 whitespace-nowrap text-sm text-gray-500",
+            class_name="px-4 py-2 whitespace-nowrap text-xs text-gray-500",
         ),
         rx.el.td(
             status_badge(dispositivo["activo"], "Activo", "Inactivo"),
-            class_name="px-6 py-4 whitespace-nowrap",
+            class_name="px-4 py-2 whitespace-nowrap",
         ),
         rx.el.td(
             status_badge(dispositivo["en_linea"], "Conectado", "Desconectado"),
-            class_name="px-6 py-4 whitespace-nowrap",
+            class_name="px-4 py-2 whitespace-nowrap",
         ),
         rx.el.td(
             rx.el.button(
-                rx.icon("pencil", class_name="h-4 w-4"),
+                rx.icon("pencil", class_name="h-3.5 w-3.5"),
                 on_click=lambda: ConectividadState.open_dialog(dispositivo),
-                class_name="text-blue-600 hover:text-blue-900 p-2 hover:bg-blue-50 rounded-full transition-colors",
+                class_name="text-blue-600 hover:text-blue-900 p-1.5 hover:bg-blue-50 rounded-full transition-colors",
             ),
-            class_name="px-6 py-4 whitespace-nowrap text-right text-sm font-medium",
+            class_name="px-4 py-2 whitespace-nowrap text-right text-xs font-medium",
         ),
         class_name="hover:bg-gray-50 transition-colors",
     )

@@ -7,19 +7,20 @@ def list_item(item: dict) -> rx.Component:
     is_selected = CatalogoNivel1State.selected_item["codigo"] == item["codigo"]
     return rx.el.div(
         rx.el.div(
-            rx.el.p(item["descripcion"], class_name="font-medium text-sm"),
+            rx.el.p(item["descripcion"], class_name="font-medium text-xs"),
             rx.el.p(
-                f"Código: {item['codigo']}", class_name="text-xs text-muted-foreground"
+                f"Código: {item['codigo']}",
+                class_name="text-[10px] text-muted-foreground",
             ),
         ),
         on_click=lambda: CatalogoNivel1State.select_item(item),
         class_name=rx.cond(
             is_selected,
-            "p-3 rounded-lg bg-blue-50 border border-blue-200 cursor-pointer transition-all",
+            "p-2.5 rounded-lg bg-blue-50 border border-blue-200 cursor-pointer transition-all",
             rx.cond(
                 item["activo"],
-                "p-3 rounded-lg hover:bg-gray-50 cursor-pointer border border-transparent transition-all",
-                "p-3 rounded-lg bg-gray-50 opacity-60 cursor-pointer border border-transparent transition-all grayscale",
+                "p-2.5 rounded-lg hover:bg-gray-50 cursor-pointer border border-transparent transition-all",
+                "p-2.5 rounded-lg bg-gray-50 opacity-60 cursor-pointer border border-transparent transition-all grayscale",
             ),
         ),
     )
@@ -131,7 +132,7 @@ def catalogo_nivel1_page() -> rx.Component:
         rx.el.div(
             rx.el.h2(
                 ParametrosGeneralesState.nivel_1,
-                class_name="text-2xl font-bold text-gray-900",
+                class_name="text-xl font-bold text-gray-900",
             ),
             rx.el.div(
                 rx.el.label(
@@ -139,23 +140,23 @@ def catalogo_nivel1_page() -> rx.Component:
                         type="checkbox",
                         checked=CatalogoNivel1State.show_inactive,
                         on_change=CatalogoNivel1State.set_show_inactive,
-                        class_name="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500",
+                        class_name="w-3.5 h-3.5 rounded border-gray-300 text-blue-600 focus:ring-blue-500",
                     ),
                     rx.el.span(
                         "Mostrar inactivos",
-                        class_name="ml-2 text-sm font-medium text-gray-700",
+                        class_name="ml-2 text-xs font-medium text-gray-700",
                     ),
                     class_name="flex items-center cursor-pointer select-none mr-4",
                 ),
                 rx.el.button(
-                    rx.icon("plus", class_name="w-4 h-4 mr-2"),
+                    rx.icon("plus", class_name="w-3.5 h-3.5 mr-2"),
                     "Nuevo",
                     on_click=CatalogoNivel1State.new_item,
-                    class_name="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow-sm transition-all",
+                    class_name="flex items-center px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow-sm transition-all text-xs",
                 ),
                 class_name="flex items-center",
             ),
-            class_name="flex justify-between items-center mb-6",
+            class_name="flex justify-between items-center mb-4",
         ),
         rx.el.div(
             rx.el.div(

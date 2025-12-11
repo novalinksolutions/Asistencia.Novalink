@@ -8,22 +8,22 @@ def employee_list_item(emp: Employee) -> rx.Component:
         rx.el.div(
             rx.el.p(
                 f"{emp['apellidos']} {emp['nombres']}",
-                class_name="font-medium text-sm text-gray-900 truncate",
+                class_name="font-medium text-xs text-gray-900 truncate",
             ),
             rx.el.div(
                 rx.icon("id-card", class_name="w-3 h-3 text-gray-400 mr-1"),
-                rx.el.span(emp["cedula"], class_name="text-xs text-gray-500"),
+                rx.el.span(emp["cedula"], class_name="text-[10px] text-gray-500"),
                 class_name="flex items-center mt-0.5",
             ),
         ),
         on_click=lambda: EmpleadosState.select_employee(emp),
         class_name=rx.cond(
             is_selected,
-            "p-3 rounded-lg bg-blue-50 border border-blue-200 cursor-pointer transition-all hover:shadow-sm",
+            "p-2.5 rounded-lg bg-blue-50 border border-blue-200 cursor-pointer transition-all hover:shadow-sm",
             rx.cond(
                 emp["activo"],
-                "p-3 rounded-lg hover:bg-gray-50 cursor-pointer border border-transparent transition-all",
-                "p-3 rounded-lg bg-gray-50 opacity-60 cursor-pointer border border-transparent transition-all grayscale",
+                "p-2.5 rounded-lg hover:bg-gray-50 cursor-pointer border border-transparent transition-all",
+                "p-2.5 rounded-lg bg-gray-50 opacity-60 cursor-pointer border border-transparent transition-all grayscale",
             ),
         ),
     )

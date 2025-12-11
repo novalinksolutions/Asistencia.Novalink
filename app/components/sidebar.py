@@ -73,30 +73,30 @@ def sidebar() -> rx.Component:
                 rx.cond(
                     BaseState.sidebar_collapsed,
                     rx.image(
-                        src="/placeholder.svg", class_name="h-12 w-auto logo-filter"
+                        src="/placeholder.svg", class_name="h-10 w-auto logo-filter"
                     ),
                     rx.image(
-                        src="/placeholder.svg", class_name="h-12 w-auto logo-filter"
+                        src="/placeholder.svg", class_name="h-10 w-auto logo-filter"
                     ),
                 ),
-                class_name="flex items-center justify-center h-16 px-4 border-b",
+                class_name="flex items-center justify-center h-14 px-3 border-b",
             ),
             rx.el.nav(
                 rx.cond(
                     ~BaseState.sidebar_collapsed,
                     rx.el.h3(
                         "Menú Principal",
-                        class_name="px-4 pt-4 pb-2 text-sm tracking-wider text-muted-foreground",
+                        class_name="px-3 pt-3 pb-1.5 text-xs tracking-wider text-muted-foreground",
                     ),
                     None,
                 ),
                 rx.foreach(BaseState.navigation_menu, sidebar_module),
-                class_name="flex-1 overflow-auto py-2 px-4 space-y-2 flex flex-col",
+                class_name="flex-1 overflow-auto py-2 px-3 space-y-1.5 flex flex-col",
             ),
         ),
         class_name=rx.cond(
             BaseState.sidebar_collapsed,
-            "flex flex-col h-screen bg-sidebar-background/95 text-sidebar-foreground border-r border-sidebar-border shadow-lg transition-smooth w-[72px] ios-blur",
-            "flex flex-col h-screen bg-sidebar-background/95 text-sidebar-foreground border-r border-sidebar-border shadow-lg transition-smooth w-72 md:w-[288px] ios-blur",
+            "flex flex-col h-screen bg-sidebar-background/95 text-sidebar-foreground border-r border-sidebar-border shadow-lg transition-smooth w-[64px] ios-blur",
+            "flex flex-col h-screen bg-sidebar-background/95 text-sidebar-foreground border-r border-sidebar-border shadow-lg transition-smooth w-64 md:w-[256px] ios-blur",
         ),
     )

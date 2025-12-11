@@ -41,18 +41,18 @@ def dashboard() -> rx.Component:
             rx.el.div(
                 rx.el.h2(
                     "Bienvenido al Panel de Administración",
-                    class_name="text-2xl font-bold text-gray-800 mb-4",
+                    class_name="text-xl font-bold text-gray-800 mb-3",
                 ),
                 rx.el.p(
                     f"Página activa: {BaseState.active_page}",
-                    class_name="text-gray-600",
+                    class_name="text-gray-600 text-sm",
                 ),
                 rx.el.div(
                     rx.el.p(
                         "Seleccione una opción del menú lateral para comenzar.",
-                        class_name="text-gray-500",
+                        class_name="text-gray-500 text-sm",
                     ),
-                    class_name="mt-8 p-8 bg-white rounded-lg border border-gray-200 shadow-sm",
+                    class_name="mt-6 p-6 bg-white rounded-lg border border-gray-200 shadow-sm",
                 ),
                 class_name="animate-fade-in-up",
             ),
