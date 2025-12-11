@@ -118,9 +118,9 @@ def header() -> rx.Component:
         rx.el.header(
             rx.el.div(
                 rx.el.button(
-                    rx.icon("menu", class_name="h-5 w-5 text-muted-foreground"),
+                    rx.icon("menu", class_name="h-6 w-6 text-muted-foreground"),
                     on_click=BaseState.toggle_sidebar,
-                    class_name="p-1.5 rounded-full ios-hover",
+                    class_name="p-2 rounded-full ios-hover",
                 ),
                 class_name="flex-1 flex justify-start",
             ),
@@ -128,12 +128,12 @@ def header() -> rx.Component:
                 rx.cond(
                     BaseState.current_company_name != "",
                     rx.el.div(
-                        rx.icon("building-2", class_name="h-3.5 w-3.5 text-primary"),
+                        rx.icon("building-2", class_name="h-4 w-4 text-primary"),
                         rx.el.span(
                             BaseState.current_company_name,
-                            class_name="text-sm font-medium text-foreground truncate max-w-[200px] md:max-w-[300px]",
+                            class_name="text-base font-medium text-foreground truncate max-w-[200px] md:max-w-[300px]",
                         ),
-                        class_name="flex items-center gap-1.5 justify-center px-3 py-1.5 bg-muted/30 rounded-md",
+                        class_name="flex items-center gap-2 justify-center px-4 py-2 bg-muted/30 rounded-md",
                     ),
                 ),
                 class_name="flex-1 flex justify-center items-center",
@@ -145,32 +145,32 @@ def header() -> rx.Component:
                             rx.el.div(
                                 rx.el.p(
                                     BaseState.logged_user_name,
-                                    class_name="text-xs text-foreground truncate max-w-[150px]",
+                                    class_name="text-sm text-foreground truncate max-w-[150px]",
                                 ),
                                 rx.el.p(
                                     BaseState.logged_user_description,
-                                    class_name="text-[10px] text-muted-foreground truncate max-w-[150px]",
+                                    class_name="text-xs text-muted-foreground truncate max-w-[150px]",
                                 ),
                                 class_name="flex flex-col text-right hidden sm:flex",
                             ),
                             rx.image(
                                 src=f"https://api.dicebear.com/9.x/initials/svg?seed={BaseState.user_initials}&backgroundColor=000000&textColor=ffffff",
-                                class_name="h-8 w-8 rounded-full border-2 border-card shrink-0",
+                                class_name="h-10 w-10 rounded-full border-2 border-card shrink-0",
                             ),
                             rx.icon(
                                 "chevron-down",
-                                class_name="h-3.5 w-3.5 text-muted-foreground shrink-0",
+                                class_name="h-4 w-4 text-muted-foreground shrink-0",
                             ),
-                            class_name="flex items-center gap-2",
+                            class_name="flex items-center gap-3",
                         ),
                         on_click=HeaderState.toggle_dropdown,
-                        class_name="flex items-center gap-2 hover:bg-muted/50 p-1 rounded-lg transition-colors",
+                        class_name="flex items-center gap-3 hover:bg-muted/50 p-1.5 rounded-xl transition-colors",
                     ),
                     user_dropdown(),
                     class_name="relative",
                 ),
-                class_name="flex-1 flex items-center justify-end gap-2",
+                class_name="flex-1 flex items-center justify-end gap-3",
             ),
-            class_name="flex items-center h-14 px-4 bg-card/95 border-b sticky top-0 z-10 shadow-sm ios-blur",
+            class_name="flex items-center h-16 px-6 bg-card/95 border-b sticky top-0 z-10 shadow-sm ios-blur",
         ),
     )

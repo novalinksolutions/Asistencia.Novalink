@@ -194,30 +194,30 @@ def tipo_justificaciones_page() -> rx.Component:
     return rx.el.div(
         justificacion_modal(),
         rx.el.div(
-            rx.el.h2("Tipos de Justificación", class_name="text-xl text-foreground"),
+            rx.el.h2("Tipos de Justificación", class_name="text-2xl text-foreground"),
             rx.el.div(
                 rx.el.label(
                     rx.el.input(
                         type="checkbox",
                         checked=TipoJustificacionesState.show_inactive,
                         on_change=TipoJustificacionesState.set_show_inactive,
-                        class_name="h-3.5 w-3.5 rounded border-input text-primary focus:ring-ring",
+                        class_name="h-4 w-4 rounded border-input text-primary focus:ring-ring",
                     ),
                     rx.el.span(
                         "Mostrar inactivos",
-                        class_name="ml-2 text-xs font-medium text-foreground",
+                        class_name="ml-2 text-sm font-medium text-foreground",
                     ),
                     class_name="flex items-center cursor-pointer select-none",
                 ),
                 class_name="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2",
             ),
             rx.el.button(
-                rx.icon("circle_plus", class_name="h-4 w-4 mr-2"),
+                rx.icon("circle_plus", class_name="h-5 w-5 mr-2"),
                 "Añadir Tipo",
                 on_click=TipoJustificacionesState.open_add_modal,
-                class_name="flex items-center px-3 py-1.5 bg-primary text-primary-foreground rounded-lg shadow-md ios-hover transition-smooth text-xs",
+                class_name="flex items-center px-4 py-2 bg-primary text-primary-foreground rounded-lg shadow-md ios-hover transition-smooth",
             ),
-            class_name="flex justify-between items-center mb-4 relative",
+            class_name="flex justify-between items-center mb-6 relative",
         ),
         rx.el.div(
             rx.el.div(
@@ -226,15 +226,15 @@ def tipo_justificaciones_page() -> rx.Component:
                         rx.el.tr(
                             rx.el.th(
                                 "Descripción",
-                                class_name="px-4 py-2 text-left text-[10px] text-muted-foreground uppercase tracking-wider",
+                                class_name="px-6 py-3 text-left text-xs text-muted-foreground uppercase tracking-wider",
                             ),
                             rx.el.th(
                                 "Estado",
-                                class_name="px-4 py-2 text-left text-[10px] text-muted-foreground uppercase tracking-wider",
+                                class_name="px-6 py-3 text-left text-xs text-muted-foreground uppercase tracking-wider",
                             ),
                             rx.el.th(
                                 "Acciones",
-                                class_name="px-4 py-2 text-right text-[10px] text-muted-foreground uppercase tracking-wider",
+                                class_name="px-6 py-3 text-right text-xs text-muted-foreground uppercase tracking-wider",
                             ),
                         )
                     ),
@@ -244,40 +244,40 @@ def tipo_justificaciones_page() -> rx.Component:
                             lambda j: rx.el.tr(
                                 rx.el.td(
                                     j["descripcion"],
-                                    class_name="px-4 py-2 whitespace-nowrap text-xs text-muted-foreground",
+                                    class_name="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground",
                                 ),
                                 rx.el.td(
                                     rx.el.span(
                                         rx.cond(j["estado"], "Activo", "Inactivo"),
                                         class_name=rx.cond(
                                             j["estado"],
-                                            "px-1.5 inline-flex text-[10px] leading-4 rounded-full bg-green-100 text-green-800",
-                                            "px-1.5 inline-flex text-[10px] leading-4 rounded-full bg-red-100 text-red-800",
+                                            "px-2 inline-flex text-xs leading-5 rounded-full bg-green-100 text-green-800",
+                                            "px-2 inline-flex text-xs leading-5 rounded-full bg-red-100 text-red-800",
                                         ),
                                     ),
-                                    class_name="px-4 py-2 whitespace-nowrap text-xs",
+                                    class_name="px-6 py-4 whitespace-nowrap text-sm",
                                 ),
                                 rx.el.td(
                                     rx.el.button(
                                         rx.icon(
-                                            "copy", class_name="h-4 w-4 text-primary"
+                                            "copy", class_name="h-5 w-5 text-primary"
                                         ),
                                         on_click=lambda: TipoJustificacionesState.open_edit_modal(
                                             j
                                         ),
-                                        class_name="p-1.5 hover:bg-accent rounded-full transition-smooth",
+                                        class_name="p-2 hover:bg-accent rounded-full transition-smooth",
                                     ),
                                     rx.el.button(
                                         rx.icon(
                                             "trash-2",
-                                            class_name="h-4 w-4 text-destructive",
+                                            class_name="h-5 w-5 text-destructive",
                                         ),
                                         on_click=lambda: TipoJustificacionesState.delete_justificacion(
                                             j["id"]
                                         ),
-                                        class_name="p-1.5 hover:bg-accent rounded-full transition-smooth",
+                                        class_name="p-2 hover:bg-accent rounded-full transition-smooth",
                                     ),
-                                    class_name="px-4 py-2 whitespace-nowrap text-right text-xs font-medium",
+                                    class_name="px-6 py-4 whitespace-nowrap text-right text-sm font-medium",
                                 ),
                                 class_name="bg-card divide-y divide-border",
                             ),

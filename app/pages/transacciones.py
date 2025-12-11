@@ -6,13 +6,13 @@ def transaccion_row(transaccion: dict) -> rx.Component:
     return rx.el.tr(
         rx.el.td(
             transaccion["dispositivo"],
-            class_name="px-4 py-2 whitespace-nowrap text-xs font-medium text-gray-900",
+            class_name="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900",
         ),
         rx.el.td(
             transaccion["fechahora"],
-            class_name="px-4 py-2 whitespace-nowrap text-xs text-gray-500",
+            class_name="px-6 py-4 whitespace-nowrap text-sm text-gray-500",
         ),
-        rx.el.td(transaccion["mensaje"], class_name="px-4 py-2 text-xs text-gray-500"),
+        rx.el.td(transaccion["mensaje"], class_name="px-6 py-4 text-sm text-gray-500"),
         class_name="hover:bg-gray-50 transition-colors",
     )
 
@@ -21,20 +21,20 @@ def transacciones_page() -> rx.Component:
     return rx.el.div(
         rx.el.div(
             rx.el.div(
-                rx.el.h2("Transacciones", class_name="text-xl text-foreground"),
+                rx.el.h2("Transacciones", class_name="text-2xl text-foreground"),
                 rx.el.button(
-                    rx.icon("refresh-ccw", class_name="h-3.5 w-3.5 mr-2"),
+                    rx.icon("refresh-ccw", class_name="h-4 w-4 mr-2"),
                     "Actualizar",
                     on_click=TransaccionesState.load_transacciones,
-                    class_name="inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500",
+                    class_name="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500",
                 ),
-                class_name="flex justify-between items-center mb-4",
+                class_name="flex justify-between items-center mb-6",
             ),
             rx.el.div(
                 rx.el.div(
                     rx.el.label(
                         "Filtrar por Dispositivo:",
-                        class_name="block text-xs font-medium text-gray-700 mb-1",
+                        class_name="block text-sm font-medium text-gray-700 mb-1",
                     ),
                     rx.el.select(
                         rx.el.option("Todos los dispositivos", value=""),
@@ -44,18 +44,18 @@ def transacciones_page() -> rx.Component:
                         ),
                         value=TransaccionesState.selected_dispositivo_id,
                         on_change=TransaccionesState.set_device_filter,
-                        class_name="block w-full pl-2 pr-8 py-1.5 text-xs border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 rounded-md",
+                        class_name="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md",
                     ),
                     class_name="w-full max-w-xs",
                 ),
                 rx.el.div(
                     rx.el.span(
                         "Mostrando transacciones del día actual",
-                        class_name="text-xs text-gray-500 italic",
+                        class_name="text-sm text-gray-500 italic",
                     ),
-                    class_name="flex items-end pb-1.5",
+                    class_name="flex items-end pb-2",
                 ),
-                class_name="flex justify-between items-end mb-4 bg-gray-50 p-3 rounded-lg border border-gray-200",
+                class_name="flex justify-between items-end mb-6 bg-gray-50 p-4 rounded-lg border border-gray-200",
             ),
             rx.el.div(
                 rx.el.table(
@@ -63,15 +63,15 @@ def transacciones_page() -> rx.Component:
                         rx.el.tr(
                             rx.el.th(
                                 "Dispositivo",
-                                class_name="px-4 py-2 bg-gray-50 text-left text-[10px] font-medium text-gray-500 uppercase tracking-wider",
+                                class_name="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider",
                             ),
                             rx.el.th(
                                 "Fecha y Hora",
-                                class_name="px-4 py-2 bg-gray-50 text-left text-[10px] font-medium text-gray-500 uppercase tracking-wider",
+                                class_name="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider",
                             ),
                             rx.el.th(
                                 "Mensaje",
-                                class_name="px-4 py-2 bg-gray-50 text-left text-[10px] font-medium text-gray-500 uppercase tracking-wider",
+                                class_name="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider",
                             ),
                         )
                     ),

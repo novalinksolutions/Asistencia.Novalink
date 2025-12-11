@@ -135,14 +135,14 @@ def roles_page() -> rx.Component:
         role_modal(),
         delete_confirmation_dialog(),
         rx.el.div(
-            rx.el.h2("Roles y Permisos", class_name="text-xl text-foreground"),
+            rx.el.h2("Roles y Permisos", class_name="text-2xl text-foreground"),
             rx.el.button(
-                rx.icon("circle_plus", class_name="h-4 w-4 mr-2"),
+                rx.icon("circle_plus", class_name="h-5 w-5 mr-2"),
                 "Añadir Rol",
                 on_click=RolesState.open_add_modal,
-                class_name="flex items-center px-3 py-1.5 bg-primary text-primary-foreground rounded-lg shadow-md ios-hover transition-smooth text-xs",
+                class_name="flex items-center px-4 py-2 bg-primary text-primary-foreground rounded-lg shadow-md ios-hover transition-smooth",
             ),
-            class_name="flex justify-between items-center mb-4",
+            class_name="flex justify-between items-center mb-6",
         ),
         rx.el.div(
             rx.el.div(
@@ -151,19 +151,19 @@ def roles_page() -> rx.Component:
                         rx.el.tr(
                             rx.el.th(
                                 "Nombre del Rol",
-                                class_name="px-4 py-2 text-left text-[10px] text-muted-foreground uppercase tracking-wider",
+                                class_name="px-6 py-3 text-left text-xs text-muted-foreground uppercase tracking-wider",
                             ),
                             rx.el.th(
                                 "Descripción",
-                                class_name="px-4 py-2 text-left text-[10px] text-muted-foreground uppercase tracking-wider",
+                                class_name="px-6 py-3 text-left text-xs text-muted-foreground uppercase tracking-wider",
                             ),
                             rx.el.th(
                                 "Permisos",
-                                class_name="px-4 py-2 text-left text-[10px] text-muted-foreground uppercase tracking-wider",
+                                class_name="px-6 py-3 text-left text-xs text-muted-foreground uppercase tracking-wider",
                             ),
                             rx.el.th(
                                 "Acciones",
-                                class_name="px-4 py-2 text-right text-[10px] text-muted-foreground uppercase tracking-wider",
+                                class_name="px-6 py-3 text-right text-xs text-muted-foreground uppercase tracking-wider",
                             ),
                         )
                     ),
@@ -173,40 +173,40 @@ def roles_page() -> rx.Component:
                             lambda role: rx.el.tr(
                                 rx.el.td(
                                     role["name"],
-                                    class_name="px-4 py-2 whitespace-nowrap text-xs text-foreground",
+                                    class_name="px-6 py-4 whitespace-nowrap text-sm text-foreground",
                                 ),
                                 rx.el.td(
                                     role["description"],
-                                    class_name="px-4 py-2 whitespace-nowrap text-xs text-muted-foreground max-w-xs truncate",
+                                    class_name="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground max-w-xs truncate",
                                 ),
                                 rx.el.td(
                                     rx.el.span(
                                         role["permissions"].length().to_string(),
-                                        class_name="px-2 py-0.5 text-[10px] rounded-full bg-primary/10 text-primary",
+                                        class_name="px-2.5 py-1 text-xs rounded-full bg-primary/10 text-primary",
                                     ),
-                                    class_name="px-4 py-2 whitespace-nowrap text-xs",
+                                    class_name="px-6 py-4 whitespace-nowrap text-sm",
                                 ),
                                 rx.el.td(
                                     rx.el.button(
                                         rx.icon(
-                                            "copy", class_name="h-4 w-4 text-primary"
+                                            "copy", class_name="h-5 w-5 text-primary"
                                         ),
                                         on_click=lambda: RolesState.open_edit_modal(
                                             role
                                         ),
-                                        class_name="p-1.5 hover:bg-accent rounded-full transition-smooth",
+                                        class_name="p-2 hover:bg-accent rounded-full transition-smooth",
                                     ),
                                     rx.el.button(
                                         rx.icon(
                                             "trash-2",
-                                            class_name="h-4 w-4 text-destructive",
+                                            class_name="h-5 w-5 text-destructive",
                                         ),
                                         on_click=lambda: RolesState.confirm_delete_role(
                                             role
                                         ),
-                                        class_name="p-1.5 hover:bg-accent rounded-full transition-smooth",
+                                        class_name="p-2 hover:bg-accent rounded-full transition-smooth",
                                     ),
-                                    class_name="px-4 py-2 whitespace-nowrap text-right text-xs font-medium space-x-1.5",
+                                    class_name="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2",
                                 ),
                             ),
                         ),

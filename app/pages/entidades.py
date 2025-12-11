@@ -7,23 +7,23 @@ def entidad_list_item(item: dict) -> rx.Component:
     is_selected = EntidadesState.selected_item["codigo"] == item["codigo"]
     return rx.el.div(
         rx.el.div(
-            rx.el.p(item["descripcion"], class_name="font-medium text-xs"),
+            rx.el.p(item["descripcion"], class_name="font-medium text-sm"),
             rx.el.div(
                 rx.el.p(
                     f"Código: {item['codigo']}",
-                    class_name="text-[10px] text-muted-foreground",
+                    class_name="text-xs text-muted-foreground",
                 ),
-                class_name="flex items-center gap-1.5",
+                class_name="flex items-center gap-2",
             ),
         ),
         on_click=lambda: EntidadesState.select_item(item),
         class_name=rx.cond(
             is_selected,
-            "p-2.5 rounded-lg bg-blue-50 border border-blue-200 cursor-pointer transition-all",
+            "p-3 rounded-lg bg-blue-50 border border-blue-200 cursor-pointer transition-all",
             rx.cond(
                 item["activo"],
-                "p-2.5 rounded-lg hover:bg-gray-50 cursor-pointer border border-transparent transition-all",
-                "p-2.5 rounded-lg bg-gray-100 opacity-60 cursor-pointer border border-gray-200 transition-all",
+                "p-3 rounded-lg hover:bg-gray-50 cursor-pointer border border-transparent transition-all",
+                "p-3 rounded-lg bg-gray-100 opacity-60 cursor-pointer border border-gray-200 transition-all",
             ),
         ),
     )

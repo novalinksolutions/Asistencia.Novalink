@@ -142,17 +142,17 @@ def usuarios_page() -> rx.Component:
         user_modal(),
         delete_confirmation_dialog(),
         rx.el.div(
-            rx.el.h2("Gestión de Usuarios", class_name="text-xl text-foreground"),
+            rx.el.h2("Gestión de Usuarios", class_name="text-2xl text-foreground"),
             rx.el.div(
                 rx.el.div(
                     rx.icon(
                         "search",
-                        class_name="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground",
+                        class_name="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground",
                     ),
                     rx.el.input(
                         placeholder="Buscar por usuario o descripción...",
                         on_change=UsuariosState.set_search_query,
-                        class_name="pl-8 pr-3 py-1.5 w-full md:w-64 rounded-lg border border-input bg-background text-xs focus:outline-none focus:ring-2 focus:ring-ring transition-smooth",
+                        class_name="pl-9 pr-4 py-2 w-full md:w-64 rounded-lg border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring transition-smooth",
                     ),
                     class_name="relative",
                 ),
@@ -161,23 +161,23 @@ def usuarios_page() -> rx.Component:
                         type="checkbox",
                         checked=UsuariosState.show_inactive,
                         on_change=UsuariosState.set_show_inactive,
-                        class_name="h-3.5 w-3.5 rounded border-input text-primary focus:ring-ring",
+                        class_name="h-4 w-4 rounded border-input text-primary focus:ring-ring",
                     ),
                     rx.el.span(
                         "Mostrar inactivos",
-                        class_name="ml-2 text-xs font-medium text-foreground",
+                        class_name="ml-2 text-sm font-medium text-foreground",
                     ),
                     class_name="flex items-center cursor-pointer select-none whitespace-nowrap",
                 ),
                 rx.el.button(
-                    rx.icon("circle_plus", class_name="h-4 w-4 mr-2"),
+                    rx.icon("circle_plus", class_name="h-5 w-5 mr-2"),
                     "Añadir Usuario",
                     on_click=UsuariosState.open_add_modal,
-                    class_name="flex items-center px-3 py-1.5 bg-primary text-primary-foreground rounded-lg shadow-md ios-hover transition-smooth whitespace-nowrap text-xs",
+                    class_name="flex items-center px-4 py-2 bg-primary text-primary-foreground rounded-lg shadow-md ios-hover transition-smooth whitespace-nowrap",
                 ),
-                class_name="flex flex-col md:flex-row items-start md:items-center gap-3",
+                class_name="flex flex-col md:flex-row items-start md:items-center gap-4",
             ),
-            class_name="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-3",
+            class_name="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4",
         ),
         rx.el.div(
             rx.el.div(
@@ -186,19 +186,19 @@ def usuarios_page() -> rx.Component:
                         rx.el.tr(
                             rx.el.th(
                                 "Usuario",
-                                class_name="px-4 py-2 text-left text-[10px] text-muted-foreground uppercase tracking-wider",
+                                class_name="px-6 py-3 text-left text-xs text-muted-foreground uppercase tracking-wider",
                             ),
                             rx.el.th(
                                 "Descripción",
-                                class_name="px-4 py-2 text-left text-[10px] text-muted-foreground uppercase tracking-wider",
+                                class_name="px-6 py-3 text-left text-xs text-muted-foreground uppercase tracking-wider",
                             ),
                             rx.el.th(
                                 "Estado",
-                                class_name="px-4 py-2 text-left text-[10px] text-muted-foreground uppercase tracking-wider",
+                                class_name="px-6 py-3 text-left text-xs text-muted-foreground uppercase tracking-wider",
                             ),
                             rx.el.th(
                                 "Acciones",
-                                class_name="px-4 py-2 text-right text-[10px] text-muted-foreground uppercase tracking-wider",
+                                class_name="px-6 py-3 text-right text-xs text-muted-foreground uppercase tracking-wider",
                             ),
                         )
                     ),
@@ -209,46 +209,46 @@ def usuarios_page() -> rx.Component:
                                 rx.el.td(
                                     rx.el.span(
                                         user["name"],
-                                        class_name="text-xs font-normal text-foreground",
+                                        class_name="text-sm font-normal text-foreground",
                                     ),
-                                    class_name="px-4 py-2 whitespace-nowrap",
+                                    class_name="px-6 py-4 whitespace-nowrap",
                                 ),
                                 rx.el.td(
                                     user["description"],
-                                    class_name="px-4 py-2 whitespace-nowrap text-xs text-muted-foreground",
+                                    class_name="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground",
                                 ),
                                 rx.el.td(
                                     rx.el.span(
                                         rx.cond(user["active"], "Activo", "Inactivo"),
                                         class_name=rx.cond(
                                             user["active"],
-                                            "px-1.5 inline-flex text-[10px] leading-4 rounded-full bg-green-100 text-green-800",
-                                            "px-1.5 inline-flex text-[10px] leading-4 rounded-full bg-red-100 text-red-800",
+                                            "px-2 inline-flex text-xs leading-5 rounded-full bg-green-100 text-green-800",
+                                            "px-2 inline-flex text-xs leading-5 rounded-full bg-red-100 text-red-800",
                                         ),
                                     ),
-                                    class_name="px-4 py-2 whitespace-nowrap text-xs",
+                                    class_name="px-6 py-4 whitespace-nowrap text-sm",
                                 ),
                                 rx.el.td(
                                     rx.el.button(
                                         rx.icon(
-                                            "copy", class_name="h-4 w-4 text-primary"
+                                            "copy", class_name="h-5 w-5 text-primary"
                                         ),
                                         on_click=lambda: UsuariosState.open_edit_modal(
                                             user
                                         ),
-                                        class_name="p-1.5 hover:bg-accent rounded-full transition-smooth",
+                                        class_name="p-2 hover:bg-accent rounded-full transition-smooth",
                                     ),
                                     rx.el.button(
                                         rx.icon(
                                             "trash-2",
-                                            class_name="h-4 w-4 text-destructive",
+                                            class_name="h-5 w-5 text-destructive",
                                         ),
                                         on_click=lambda: UsuariosState.confirm_delete_user(
                                             user
                                         ),
-                                        class_name="p-1.5 hover:bg-accent rounded-full transition-smooth",
+                                        class_name="p-2 hover:bg-accent rounded-full transition-smooth",
                                     ),
-                                    class_name="px-4 py-2 whitespace-nowrap text-right text-xs font-medium",
+                                    class_name="px-6 py-4 whitespace-nowrap text-right text-sm font-medium",
                                 ),
                             ),
                         ),

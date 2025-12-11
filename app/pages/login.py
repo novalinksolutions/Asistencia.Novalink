@@ -7,19 +7,19 @@ def login_form_field(
 ) -> rx.Component:
     return rx.el.div(
         rx.el.label(
-            label, html_for=name, class_name="text-sm text-gray-700 ml-1 mb-1.5"
+            label, html_for=name, class_name="text-[15px] text-gray-700 ml-1 mb-2"
         ),
         rx.el.div(
             rx.icon(
                 icon,
-                class_name="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400",
+                class_name="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400",
             ),
             rx.el.input(
                 id=name,
                 name=name,
                 placeholder=placeholder,
                 type=type,
-                class_name="w-full h-10 pl-9 pr-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 text-sm transition-all duration-200",
+                class_name="w-full h-11 pl-10 pr-4 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 text-[15px] transition-all duration-200",
             ),
             class_name="relative w-full",
         ),
@@ -115,10 +115,10 @@ def login_page() -> rx.Component:
             ),
             rx.el.div(
                 rx.el.div(
-                    rx.el.h1("Bienvenido", class_name="text-xl text-gray-900"),
+                    rx.el.h1("Bienvenido", class_name="text-[25px] text-gray-900"),
                     rx.el.p(
                         "Inicia sesión para continuar",
-                        class_name="text-gray-500 text-sm mt-1 mb-6",
+                        class_name="text-gray-500 text-[15px] mt-1 mb-8",
                     ),
                     rx.el.form(
                         rx.el.input(
@@ -136,20 +136,22 @@ def login_page() -> rx.Component:
                             login_form_field(
                                 "Contraseña", "password", "••••••••", "password", "lock"
                             ),
-                            class_name="flex flex-col gap-4 w-full mb-6",
+                            class_name="flex flex-col gap-5 w-full mb-8",
                         ),
                         rx.el.div(
                             rx.el.button(
                                 rx.cond(
                                     LoginState.is_loading,
                                     rx.el.div(
-                                        class_name="animate-spin rounded-full h-3.5 w-3.5 border-2 border-white border-t-transparent"
+                                        class_name="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"
                                     ),
-                                    rx.el.span("Iniciar Sesión", class_name="text-sm"),
+                                    rx.el.span(
+                                        "Iniciar Sesión", class_name="text-[15px]"
+                                    ),
                                 ),
                                 type="submit",
                                 disabled=LoginState.is_loading,
-                                class_name="w-full h-10 flex justify-center items-center bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg hover:shadow-blue-500/30 transition-all duration-300 active:scale-[0.98]",
+                                class_name="w-full h-12 flex justify-center items-center bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg hover:shadow-blue-500/30 transition-all duration-300 active:scale-[0.98]",
                             ),
                             class_name="flex justify-center w-full",
                         ),

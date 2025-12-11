@@ -24,22 +24,22 @@ def level_input(
 def parametros_generales_page() -> rx.Component:
     return rx.el.div(
         rx.el.div(
-            rx.el.h2("Parámetros Generales", class_name="text-xl text-gray-900"),
-            class_name="mb-6",
+            rx.el.h2("Parámetros Generales", class_name="text-2xl text-gray-900"),
+            class_name="mb-8",
         ),
         rx.tabs.root(
             rx.tabs.list(
                 rx.tabs.trigger(
                     "Niveles Administrativos",
                     value="tab1",
-                    class_name="px-3 py-1.5 text-xs font-medium text-gray-600 border-b-2 border-transparent hover:text-gray-800 hover:border-gray-300 data-[state=active]:border-blue-500 data-[state=active]:text-blue-600 transition-colors cursor-pointer",
+                    class_name="px-4 py-2 text-sm font-medium text-gray-600 border-b-2 border-transparent hover:text-gray-800 hover:border-gray-300 data-[state=active]:border-blue-500 data-[state=active]:text-blue-600 transition-colors cursor-pointer",
                 ),
                 rx.tabs.trigger(
                     "Parámetros Adicionales",
                     value="tab2",
-                    class_name="px-3 py-1.5 text-xs font-medium text-gray-600 border-b-2 border-transparent hover:text-gray-800 hover:border-gray-300 data-[state=active]:border-blue-500 data-[state=active]:text-blue-600 transition-colors cursor-pointer",
+                    class_name="px-4 py-2 text-sm font-medium text-gray-600 border-b-2 border-transparent hover:text-gray-800 hover:border-gray-300 data-[state=active]:border-blue-500 data-[state=active]:text-blue-600 transition-colors cursor-pointer",
                 ),
-                class_name="flex border-b border-gray-200 mb-4",
+                class_name="flex border-b border-gray-200 mb-6",
             ),
             rx.tabs.content(
                 rx.el.div(
