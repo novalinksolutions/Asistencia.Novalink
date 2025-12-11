@@ -33,7 +33,7 @@ class ConectividadState(DatabaseState):
         """Fetch all devices from the database."""
         self.is_loading = True
         try:
-            query = "SELECT codigo, descripcion, activo, enlinea FROM public.dispositivos WHERE codigo > 0 ORDER BY codigo"
+            query = "SELECT codigo, descripcion, activo, enlinea FROM public.dispositivos ORDER BY codigo"
             results = await self._execute_query(query, target_db="novalink")
             self.dispositivos = [
                 Dispositivo(
