@@ -111,9 +111,9 @@ class LoginState(DatabaseState):
         self.error_message = ""
         yield
         await asyncio.sleep(1)
-        self.empresa = form_data.get("empresa", "").strip()
-        self.username = form_data.get("username", "").strip()
-        self.password = form_data.get("password", "").strip()
+        self.empresa = (form_data.get("empresa") or "").strip()
+        self.username = (form_data.get("username") or "").strip()
+        self.password = (form_data.get("password") or "").strip()
         if not self.empresa or not self.username or (not self.password):
             if not self.empresa and self.search_text:
                 self.error_message = "Debe seleccionar una empresa válida de la lista."
