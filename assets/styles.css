@@ -72,7 +72,7 @@
 
 @layer base {
   html {
-    font-size: 10.8px;
+    font-size: 10.9px;
   }
   * {
     border-color: hsl(var(--border));
