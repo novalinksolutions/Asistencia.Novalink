@@ -9,7 +9,7 @@ def base_layout(content: rx.Component) -> rx.Component:
         rx.el.div(
             header(),
             rx.el.main(content, class_name="flex-1 p-6 bg-background"),
-            class_name="flex flex-col flex-1",
+            class_name="flex flex-col flex-1 min-h-screen",
         ),
         class_name="flex min-h-screen w-full bg-background",
     )

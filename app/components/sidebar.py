@@ -93,10 +93,11 @@ def sidebar() -> rx.Component:
                 rx.foreach(BaseState.navigation_menu, sidebar_module),
                 class_name="flex-1 overflow-auto py-2 px-4 space-y-2 flex flex-col",
             ),
+            class_name="flex flex-col h-full w-full",
         ),
         class_name=rx.cond(
             BaseState.sidebar_collapsed,
-            "flex flex-col h-screen bg-sidebar-background/95 text-sidebar-foreground border-r border-sidebar-border shadow-lg transition-smooth w-[72px] ios-blur",
-            "flex flex-col h-screen bg-sidebar-background/95 text-sidebar-foreground border-r border-sidebar-border shadow-lg transition-smooth w-72 md:w-[288px] ios-blur",
+            "sticky top-0 flex flex-col h-screen bg-sidebar-background/95 text-sidebar-foreground border-r border-sidebar-border shadow-lg transition-smooth w-[72px] ios-blur",
+            "sticky top-0 flex flex-col h-screen bg-sidebar-background/95 text-sidebar-foreground border-r border-sidebar-border shadow-lg transition-smooth w-72 md:w-[288px] ios-blur",
         ),
     )
