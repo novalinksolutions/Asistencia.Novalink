@@ -516,16 +516,37 @@ class EmpleadosState(DatabaseState):
         emp["nombres"] = emp["nombres"].strip().upper()
         emp["apellidos"] = emp["apellidos"].strip().upper()
         validation_errors = []
-        if not self.id_input:
-            validation_errors.append("El ID es obligatorio")
         if not emp["cedula"] or not emp["cedula"].strip():
             validation_errors.append("La Cédula es obligatoria")
         if not emp["nombres"] or not emp["nombres"].strip():
             validation_errors.append("Los Nombres son obligatorios")
         if not emp["apellidos"] or not emp["apellidos"].strip():
             validation_errors.append("Los Apellidos son obligatorios")
+        if emp["niveladm1"] <= 0:
+            label = self.labels_niveles.get("1", "Nivel 1")
+            validation_errors.append(f"El campo '{label}' es obligatorio")
+        if self.niveles_habilitados >= 2 and emp["niveladm2"] <= 0:
+            label = self.labels_niveles.get("2", "Nivel 2")
+            validation_errors.append(f"El campo '{label}' es obligatorio")
+        if self.niveles_habilitados >= 3 and emp["niveladm3"] <= 0:
+            label = self.labels_niveles.get("3", "Nivel 3")
+            validation_errors.append(f"El campo '{label}' es obligatorio")
+        if self.niveles_habilitados >= 4 and emp["niveladm4"] <= 0:
+            label = self.labels_niveles.get("4", "Nivel 4")
+            validation_errors.append(f"El campo '{label}' es obligatorio")
+        if self.niveles_habilitados >= 5 and emp["niveladm5"] <= 0:
+            label = self.labels_niveles.get("5", "Nivel 5")
+            validation_errors.append(f"El campo '{label}' es obligatorio")
+        if emp["cargo"] <= 0:
+            validation_errors.append("El Cargo es obligatorio")
+        if emp["tipo"] <= 0:
+            validation_errors.append("El Tipo de Empleado es obligatorio")
+        if emp.get("grupo", 0) <= 0:
+            validation_errors.append("El Grupo es obligatorio")
         if validation_errors:
-            yield rx.toast.error(f"Validación: {', '.join(validation_errors)}.")
+            yield rx.toast.error(
+                f"Error de validación: {', '.join(validation_errors)}."
+            )
             return
         from app.states.base_state import BaseState
 
@@ -535,17 +556,26 @@ class EmpleadosState(DatabaseState):
         if len(pwd_val) != 64:
             pwd_val = hashlib.sha256(pwd_val.encode()).hexdigest()
         try:
-            new_id = int(self.id_input)
+            new_id = 0
+            if self.id_input:
+                new_id = int(self.id_input)
             if self.editing_employee_id == 0:
-                check_query = "SELECT 1 FROM public.empleados WHERE id = :id"
-                exists_res = await self._execute_query(
-                    check_query, {"id": new_id}, target_db="novalink"
-                )
-                if exists_res:
-                    yield rx.toast.error(
-                        f"El ID {new_id} ya existe. Por favor use otro."
+                if new_id == 0:
+                    next_id_res = await self._execute_query(
+                        "SELECT COALESCE(MAX(id), 0) + 1 as next_id FROM public.empleados",
+                        target_db="novalink",
                     )
-                    return
+                    new_id = next_id_res[0]["next_id"] if next_id_res else 1
+                else:
+                    check_query = "SELECT 1 FROM public.empleados WHERE id = :id"
+                    exists_res = await self._execute_query(
+                        check_query, {"id": new_id}, target_db="novalink"
+                    )
+                    if exists_res:
+                        yield rx.toast.error(
+                            f"El ID {new_id} ya existe. Por favor use otro."
+                        )
+                        return
                 query = """
                     INSERT INTO public.empleados (
                         id, cedula, nombres, apellidos, correoelectronico,
@@ -603,6 +633,8 @@ class EmpleadosState(DatabaseState):
                 yield rx.toast.success(f"Empleado creado con ID {new_id}")
             else:
                 original_id = self.editing_employee_id
+                if new_id == 0:
+                    new_id = original_id
                 if new_id != original_id:
                     check_query = "SELECT 1 FROM public.empleados WHERE id = :id AND id != :old_id"
                     exists_res = await self._execute_query(

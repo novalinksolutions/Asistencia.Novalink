@@ -86,18 +86,17 @@ def sidebar() -> rx.Component:
                     ~BaseState.sidebar_collapsed,
                     rx.el.h3(
                         "Menú Principal",
-                        class_name="px-4 pt-4 pb-2 text-base tracking-wider text-muted-foreground",
+                        class_name="px-4 pt-4 pb-2 text-sm tracking-wider text-muted-foreground",
                     ),
                     None,
                 ),
                 rx.foreach(BaseState.navigation_menu, sidebar_module),
                 class_name="flex-1 overflow-auto py-2 px-4 space-y-2 flex flex-col",
             ),
-            class_name="flex flex-col h-full w-full",
         ),
         class_name=rx.cond(
             BaseState.sidebar_collapsed,
-            "sticky top-0 flex flex-col h-screen bg-sidebar-background/95 text-sidebar-foreground border-r border-sidebar-border shadow-lg transition-smooth w-[72px] ios-blur",
-            "sticky top-0 flex flex-col h-screen bg-sidebar-background/95 text-sidebar-foreground border-r border-sidebar-border shadow-lg transition-smooth w-72 md:w-[288px] ios-blur",
+            "flex flex-col h-screen bg-sidebar-background/95 text-sidebar-foreground border-r border-sidebar-border shadow-lg transition-smooth w-[72px] ios-blur",
+            "flex flex-col h-screen bg-sidebar-background/95 text-sidebar-foreground border-r border-sidebar-border shadow-lg transition-smooth w-72 md:w-[288px] ios-blur",
         ),
     )
