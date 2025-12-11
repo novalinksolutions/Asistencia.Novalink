@@ -72,7 +72,7 @@
 
 @layer base {
   html {
-    font-size: 12px; /* Optimized for 1366x768 screens */
+    font-size: 14px; /* Approx 12.5% reduction from 16px, scales all rem units */
   }
   * {
     border-color: hsl(var(--border));
