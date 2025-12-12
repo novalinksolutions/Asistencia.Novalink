@@ -166,7 +166,7 @@ def tab_datos_basicos() -> rx.Component:
         rx.el.div(
             rx.el.h4(
                 "Configuración de Nómina y Asistencia",
-                class_name="text-sm font-semibold text-gray-900 mt-6 mb-3",
+                class_name="text-sm font-semibold text-gray-900 mb-3",
             ),
             rx.el.div(
                 form_checkbox("Gana recargo nocturno", "ganarecargonocturno"),
