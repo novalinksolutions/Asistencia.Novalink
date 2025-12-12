@@ -346,6 +346,19 @@ def form_section() -> rx.Component:
             rx.el.h3(
                 EmpleadosState.form_title, class_name="text-xl font-bold text-gray-900"
             ),
+            rx.el.label(
+                rx.el.input(
+                    type="checkbox",
+                    checked=EmpleadosState.selected_employee["activo"],
+                    on_change=lambda v: EmpleadosState.toggle_bool_field("activo", v),
+                    class_name="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500",
+                ),
+                rx.el.span(
+                    "Empleado Activo",
+                    class_name="ml-2 text-sm font-medium text-gray-900",
+                ),
+                class_name="flex items-center",
+            ),
             rx.el.div(
                 rx.el.button(
                     "Cancelar",
@@ -398,22 +411,6 @@ def form_section() -> rx.Component:
             ),
             default_value="tab1",
             class_name="flex-1",
-        ),
-        rx.el.div(
-            rx.el.label(
-                rx.el.input(
-                    type="checkbox",
-                    checked=EmpleadosState.selected_employee["activo"],
-                    on_change=lambda v: EmpleadosState.toggle_bool_field("activo", v),
-                    class_name="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500",
-                ),
-                rx.el.span(
-                    "Empleado Activo",
-                    class_name="ml-2 text-sm font-medium text-gray-900",
-                ),
-                class_name="flex items-center",
-            ),
-            class_name="mt-6 pt-4 border-t border-gray-100 flex justify-center",
         ),
         class_name="bg-white p-6 rounded-xl shadow-sm border h-full flex flex-col",
         key=EmpleadosState.editing_employee_id,
