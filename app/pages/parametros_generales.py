@@ -31,7 +31,23 @@ def parametros_generales_page() -> rx.Component:
                 "Parámetros Generales",
                 class_name="text-xl font-bold text-gray-900 tracking-tight",
             ),
-            class_name="mb-4",
+            rx.el.button(
+                rx.cond(
+                    ParametrosGeneralesState.is_loading,
+                    rx.el.div(
+                        class_name="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"
+                    ),
+                    rx.el.span(
+                        rx.icon("save", class_name="h-4 w-4 mr-2"),
+                        "Guardar Cambios",
+                        class_name="flex items-center",
+                    ),
+                ),
+                on_click=ParametrosGeneralesState.save_parameters,
+                disabled=ParametrosGeneralesState.is_loading,
+                class_name="flex items-center justify-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-sm hover:shadow-md transition-all active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed text-sm",
+            ),
+            class_name="flex justify-between items-center mb-4",
         ),
         rx.tabs.root(
             rx.tabs.list(
@@ -148,25 +164,6 @@ def parametros_generales_page() -> rx.Component:
                         ),
                         class_name="flex flex-col",
                     ),
-                    rx.el.div(
-                        rx.el.button(
-                            rx.cond(
-                                ParametrosGeneralesState.is_loading,
-                                rx.el.div(
-                                    class_name="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"
-                                ),
-                                rx.el.span(
-                                    rx.icon("save", class_name="h-4 w-4 mr-2"),
-                                    "Guardar Cambios",
-                                    class_name="flex items-center",
-                                ),
-                            ),
-                            on_click=ParametrosGeneralesState.save_parameters,
-                            disabled=ParametrosGeneralesState.is_loading,
-                            class_name="flex items-center justify-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-sm hover:shadow-md transition-all active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed text-sm",
-                        ),
-                        class_name="flex justify-end mt-4 pt-4 border-t border-gray-100",
-                    ),
                     class_name="bg-white p-5 rounded-xl shadow-sm border border-gray-200",
                 ),
                 value="tab1",
@@ -273,25 +270,6 @@ def parametros_generales_page() -> rx.Component:
                             ),
                             class_name="space-y-4",
                         ),
-                    ),
-                    rx.el.div(
-                        rx.el.button(
-                            rx.cond(
-                                ParametrosGeneralesState.is_loading,
-                                rx.el.div(
-                                    class_name="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"
-                                ),
-                                rx.el.span(
-                                    rx.icon("save", class_name="h-4 w-4 mr-2"),
-                                    "Guardar Cambios",
-                                    class_name="flex items-center",
-                                ),
-                            ),
-                            on_click=ParametrosGeneralesState.save_parameters,
-                            disabled=ParametrosGeneralesState.is_loading,
-                            class_name="flex items-center justify-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-sm hover:shadow-md transition-all active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed text-sm",
-                        ),
-                        class_name="flex justify-end mt-4 pt-4 border-t border-gray-100",
                     ),
                     class_name="bg-white p-5 rounded-xl shadow-sm border border-gray-200",
                 ),
