@@ -131,7 +131,7 @@ def header() -> rx.Component:
                         rx.icon("building-2", class_name="h-4 w-4 text-primary"),
                         rx.el.span(
                             BaseState.current_company_name,
-                            class_name="text-base font-medium text-foreground truncate max-w-[200px] md:max-w-[300px]",
+                            class_name="text-lg font-medium text-foreground truncate max-w-[200px] md:max-w-[300px]",
                         ),
                         class_name="flex items-center gap-2 justify-center px-4 py-2 bg-muted/30 rounded-md",
                     ),
