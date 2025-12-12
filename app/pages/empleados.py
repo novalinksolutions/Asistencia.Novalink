@@ -320,7 +320,7 @@ def tab_permisos() -> rx.Component:
                             class_name="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400",
                         ),
                         rx.el.input(
-                            type="text",
+                            type="password",
                             default_value=EmpleadosState.selected_employee["pwd"],
                             on_change=lambda v: EmpleadosState.set_field("pwd", v),
                             class_name="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all font-mono",
