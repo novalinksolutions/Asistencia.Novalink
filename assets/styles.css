@@ -72,7 +72,7 @@
 
 @layer base {
   html {
-    font-size: 11.1px; /* Approx 12.5% reduction from 16px, scales all rem units */
+    font-size: 13px; /* Approx 12.5% reduction from 16px, scales all rem units */
   }
   * {
     border-color: hsl(var(--border));
