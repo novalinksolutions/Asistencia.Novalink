@@ -131,7 +131,7 @@ def header() -> rx.Component:
                         rx.icon("building-2", class_name="h-4 w-4 text-primary"),
                         rx.el.span(
                             BaseState.current_company_name,
-                            class_name="text-lg font-medium text-foreground truncate max-w-[200px] md:max-w-[300px]",
+                            class_name="text-[15px] font-medium text-foreground truncate max-w-[200px] md:max-w-[300px]",
                         ),
                         class_name="flex items-center gap-2 justify-center px-4 py-2 bg-muted/30 rounded-md",
                     ),
@@ -145,11 +145,11 @@ def header() -> rx.Component:
                             rx.el.div(
                                 rx.el.p(
                                     BaseState.logged_user_name,
-                                    class_name="text-sm text-foreground truncate max-w-[150px]",
+                                    class_name="text-[13px] text-foreground truncate max-w-[150px]",
                                 ),
                                 rx.el.p(
                                     BaseState.logged_user_description,
-                                    class_name="text-xs text-muted-foreground truncate max-w-[150px]",
+                                    class_name="text-[11px] text-muted-foreground truncate max-w-[150px]",
                                 ),
                                 class_name="flex flex-col text-right hidden sm:flex",
                             ),

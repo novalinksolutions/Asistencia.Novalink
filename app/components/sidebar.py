@@ -86,7 +86,7 @@ def sidebar() -> rx.Component:
                     ~BaseState.sidebar_collapsed,
                     rx.el.h3(
                         "Menú Principal",
-                        class_name="px-4 pt-4 pb-2 text-base tracking-wider text-muted-foreground",
+                        class_name="px-4 pt-4 pb-2 text-[13px] tracking-wider text-muted-foreground",
                     ),
                     None,
                 ),
