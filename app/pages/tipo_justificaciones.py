@@ -11,10 +11,10 @@ def form_checkbox(label: str, name: str, checked: bool) -> rx.Component:
             name=name,
             type="checkbox",
             default_checked=checked,
-            class_name="h-4 w-4 rounded border-input text-primary focus:ring-ring",
+            class_name="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500",
         ),
-        rx.el.span(label, class_name="ml-2 text-sm text-foreground"),
-        class_name="flex items-center",
+        rx.el.span(label, class_name="ml-2 text-sm text-gray-700"),
+        class_name="flex items-center p-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer",
     )
 
 
@@ -31,10 +31,13 @@ def justificacion_modal() -> rx.Component:
                                 "Editar Justificación",
                                 "Añadir Justificación",
                             ),
-                            class_name="text-lg text-card-foreground",
+                            class_name="text-lg font-bold text-gray-900",
                         ),
                         rx.el.button(
-                            rx.icon("x", class_name="h-5 w-5 text-muted-foreground"),
+                            rx.icon(
+                                "x",
+                                class_name="h-5 w-5 text-gray-500 hover:text-gray-700",
+                            ),
                             on_click=TipoJustificacionesState.close_modal,
                             class_name="p-1 rounded-full ios-hover",
                         ),
@@ -44,21 +47,21 @@ def justificacion_modal() -> rx.Component:
                         rx.el.div(
                             rx.el.label(
                                 "Descripción",
-                                class_name="text-sm text-muted-foreground block mb-1",
+                                class_name="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1",
                             ),
                             rx.el.textarea(
                                 name="descripcion",
                                 default_value=TipoJustificacionesState.modal_justificacion[
                                     "descripcion"
                                 ],
-                                class_name="w-full px-3 py-2 rounded-lg border-input bg-background shadow-sm focus:ring-2 focus:ring-ring transition-smooth mb-4",
+                                class_name="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all bg-white mb-3",
                                 rows="2",
                             ),
                             rx.el.div(
                                 rx.el.div(
                                     rx.el.label(
                                         "Días máximo",
-                                        class_name="text-sm text-muted-foreground block mb-1",
+                                        class_name="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1",
                                     ),
                                     rx.el.input(
                                         name="dias_maximo",
@@ -66,13 +69,13 @@ def justificacion_modal() -> rx.Component:
                                         default_value=TipoJustificacionesState.modal_justificacion[
                                             "dias_maximo"
                                         ],
-                                        class_name="w-full px-3 py-2 rounded-lg border-input bg-background shadow-sm focus:ring-2 focus:ring-ring transition-smooth",
+                                        class_name="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all bg-white",
                                     ),
                                 ),
                                 rx.el.div(
                                     rx.el.label(
                                         "Horas máximo",
-                                        class_name="text-sm text-muted-foreground block mb-1",
+                                        class_name="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1",
                                     ),
                                     rx.el.input(
                                         name="horas_maximo",
@@ -81,13 +84,13 @@ def justificacion_modal() -> rx.Component:
                                         default_value=TipoJustificacionesState.modal_justificacion[
                                             "horas_maximo"
                                         ],
-                                        class_name="w-full px-3 py-2 rounded-lg border-input bg-background shadow-sm focus:ring-2 focus:ring-ring transition-smooth",
+                                        class_name="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all bg-white",
                                     ),
                                 ),
                                 rx.el.div(
                                     rx.el.label(
                                         "Días ingreso",
-                                        class_name="text-sm text-muted-foreground block mb-1",
+                                        class_name="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1",
                                     ),
                                     rx.el.input(
                                         name="dias_ingreso",
@@ -95,10 +98,10 @@ def justificacion_modal() -> rx.Component:
                                         default_value=TipoJustificacionesState.modal_justificacion[
                                             "dias_ingreso"
                                         ],
-                                        class_name="w-full px-3 py-2 rounded-lg border-input bg-background shadow-sm focus:ring-2 focus:ring-ring transition-smooth",
+                                        class_name="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all bg-white",
                                     ),
                                 ),
-                                class_name="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4",
+                                class_name="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3",
                             ),
                             rx.el.div(
                                 form_checkbox(
@@ -157,7 +160,7 @@ def justificacion_modal() -> rx.Component:
                                         "acumula_vacaciones"
                                     ],
                                 ),
-                                class_name="grid grid-cols-2 gap-3 mb-4 p-3 bg-muted/30 rounded-lg border",
+                                class_name="grid grid-cols-2 gap-2 mb-3 p-4 bg-gray-50 rounded-xl border border-gray-100",
                             ),
                             form_checkbox(
                                 "Activo",
@@ -170,19 +173,19 @@ def justificacion_modal() -> rx.Component:
                             rx.el.button(
                                 "Cancelar",
                                 on_click=TipoJustificacionesState.close_modal,
-                                class_name="px-4 py-2 bg-button-inactive text-button-inactive-foreground rounded-lg border border-button-inactive-border transition-smooth ios-hover",
+                                class_name="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors",
                             ),
                             rx.el.button(
                                 "Guardar",
                                 type="submit",
-                                class_name="px-4 py-2 bg-primary text-primary-foreground rounded-lg ml-3 transition-smooth ios-hover",
+                                class_name="px-4 py-2 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-sm ml-3",
                             ),
                             class_name="flex justify-end pt-4 border-t",
                         ),
                         on_submit=TipoJustificacionesState.handle_submit,
                         reset_on_submit=True,
                     ),
-                    class_name="bg-card rounded-xl shadow-xl p-6 w-full max-w-2xl",
+                    class_name="bg-white rounded-xl shadow-xl p-5 w-full max-w-2xl",
                 ),
                 class_name="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30 ios-blur",
             ),

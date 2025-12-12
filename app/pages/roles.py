@@ -9,10 +9,10 @@ def permission_checkbox(permission: Permission) -> rx.Component:
             type="checkbox",
             on_change=lambda: RolesState.toggle_permission(permission["id"]),
             checked=is_checked,
-            class_name="h-4 w-4 rounded border-input text-primary focus:ring-ring",
+            class_name="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500",
         ),
-        rx.el.span(permission["name"], class_name="ml-2 text-sm text-foreground"),
-        class_name="flex items-center p-2 rounded-md hover:bg-accent",
+        rx.el.span(permission["name"], class_name="ml-2 text-sm text-gray-700"),
+        class_name="flex items-center p-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer",
     )
 
 
@@ -29,10 +29,13 @@ def role_modal() -> rx.Component:
                                 "Editar Rol y Permisos",
                                 "Añadir Nuevo Rol",
                             ),
-                            class_name="text-xl text-card-foreground",
+                            class_name="text-lg font-bold text-gray-900",
                         ),
                         rx.el.button(
-                            rx.icon("x", class_name="h-5 w-5 text-muted-foreground"),
+                            rx.icon(
+                                "x",
+                                class_name="h-5 w-5 text-gray-500 hover:text-gray-700",
+                            ),
                             on_click=RolesState.close_modal,
                             class_name="p-1 rounded-full ios-hover",
                         ),
@@ -40,35 +43,42 @@ def role_modal() -> rx.Component:
                     ),
                     rx.el.form(
                         rx.el.div(
-                            rx.el.label(
-                                "Nombre del Rol",
-                                class_name="text-sm mb-1 text-muted-foreground",
+                            rx.el.div(
+                                rx.el.label(
+                                    "Nombre del Rol",
+                                    class_name="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1",
+                                ),
+                                rx.el.input(
+                                    name="name",
+                                    default_value=RolesState.modal_role["name"],
+                                    placeholder="Ej: Editor de Contenido",
+                                    class_name="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all bg-white",
+                                ),
+                                class_name="mb-3",
                             ),
-                            rx.el.input(
-                                name="name",
-                                default_value=RolesState.modal_role["name"],
-                                placeholder="Ej: Editor de Contenido",
-                                class_name="mt-1 w-full px-5 py-2 rounded-lg border-input bg-background shadow-sm focus:ring-2 focus:ring-ring transition-smooth",
-                            ),
-                            rx.el.label(
-                                "Descripción",
-                                class_name="text-sm mt-4 mb-1 text-muted-foreground",
-                            ),
-                            rx.el.textarea(
-                                name="description",
-                                default_value=RolesState.modal_role["description"],
-                                placeholder="Descripción breve del rol...",
-                                class_name="mt-1 w-full px-5 py-2 rounded-lg border-input bg-background shadow-sm focus:ring-2 focus:ring-ring transition-smooth",
+                            rx.el.div(
+                                rx.el.label(
+                                    "Descripción",
+                                    class_name="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1",
+                                ),
+                                rx.el.textarea(
+                                    name="description",
+                                    default_value=RolesState.modal_role["description"],
+                                    placeholder="Descripción breve del rol...",
+                                    class_name="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all bg-white",
+                                    rows="2",
+                                ),
+                                class_name="mb-4",
                             ),
                             rx.el.h4(
                                 "Permisos",
-                                class_name="text-md mt-6 mb-2 text-card-foreground",
+                                class_name="text-sm font-semibold text-gray-900 mb-2",
                             ),
                             rx.el.div(
                                 rx.foreach(
                                     RolesState.all_permissions, permission_checkbox
                                 ),
-                                class_name="grid grid-cols-2 gap-2 p-2 border rounded-lg bg-muted max-h-48 overflow-y-auto",
+                                class_name="grid grid-cols-2 gap-2 p-3 border border-gray-200 rounded-lg bg-gray-50 max-h-48 overflow-y-auto custom-scrollbar",
                             ),
                             class_name="py-4",
                         ),
@@ -76,18 +86,18 @@ def role_modal() -> rx.Component:
                             rx.el.button(
                                 "Cancelar",
                                 on_click=RolesState.close_modal,
-                                class_name="px-4 py-2 bg-button-inactive text-button-inactive-foreground rounded-lg border border-button-inactive-border transition-smooth ios-hover",
+                                class_name="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors",
                             ),
                             rx.el.button(
                                 "Guardar",
                                 type="submit",
-                                class_name="px-4 py-2 bg-primary text-primary-foreground rounded-lg ml-3 transition-smooth ios-hover",
+                                class_name="flex items-center px-4 py-2 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-sm ml-3",
                             ),
                             class_name="flex justify-end pt-4 border-t",
                         ),
                         on_submit=RolesState.handle_submit,
                     ),
-                    class_name="bg-card rounded-xl shadow-xl p-6 w-full max-w-lg",
+                    class_name="bg-white rounded-xl shadow-xl p-5 w-full max-w-lg",
                 ),
                 class_name="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30 animate-fade-in-up ios-blur",
             ),

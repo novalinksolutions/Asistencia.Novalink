@@ -26,7 +26,7 @@ def transacciones_page() -> rx.Component:
                     rx.icon("refresh-ccw", class_name="h-4 w-4 mr-2"),
                     "Actualizar",
                     on_click=TransaccionesState.load_transacciones,
-                    class_name="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500",
+                    class_name="flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors shadow-sm",
                 ),
                 class_name="flex justify-between items-center mb-6",
             ),
@@ -34,7 +34,7 @@ def transacciones_page() -> rx.Component:
                 rx.el.div(
                     rx.el.label(
                         "Filtrar por Dispositivo:",
-                        class_name="block text-sm font-medium text-gray-700 mb-1",
+                        class_name="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1",
                     ),
                     rx.el.select(
                         rx.el.option("Todos los dispositivos", value=""),
@@ -44,7 +44,7 @@ def transacciones_page() -> rx.Component:
                         ),
                         value=TransaccionesState.selected_dispositivo_id,
                         on_change=TransaccionesState.set_device_filter,
-                        class_name="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md",
+                        class_name="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all bg-white text-sm",
                     ),
                     class_name="w-full max-w-xs",
                 ),

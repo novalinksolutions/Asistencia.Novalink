@@ -109,7 +109,8 @@ def definir_feriados_page() -> rx.Component:
                     DefinirFeriadosState.show_nivel_filter,
                     rx.el.div(
                         rx.el.span(
-                            "Nivel Administrativo:", class_name="text-muted-foreground"
+                            "Nivel Administrativo:",
+                            class_name="text-sm text-gray-600 font-medium",
                         ),
                         rx.el.select(
                             rx.foreach(
@@ -118,17 +119,17 @@ def definir_feriados_page() -> rx.Component:
                             ),
                             on_change=DefinirFeriadosState.set_nivel_administrativo_seleccionado,
                             value=DefinirFeriadosState.nivel_administrativo_seleccionado,
-                            class_name="w-full max-w-[200px] px-3 py-2 rounded-lg border bg-card focus:ring-2 focus:ring-ring transition-smooth",
+                            class_name="w-full max-w-[200px] px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all bg-white text-sm",
                         ),
                         class_name="flex items-center gap-2",
                     ),
                 ),
                 rx.el.div(
                     rx.el.button(
-                        rx.icon("save", class_name="h-5 w-5 mr-2"),
+                        rx.icon("save", class_name="h-4 w-4 mr-2"),
                         "Guardar Feriados",
                         on_click=DefinirFeriadosState.save_holidays,
-                        class_name="flex items-center px-4 py-2 bg-primary text-primary-foreground rounded-lg shadow-md ios-hover transition-smooth",
+                        class_name="flex items-center px-4 py-2 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-sm",
                     ),
                     class_name="flex items-center gap-3",
                 ),

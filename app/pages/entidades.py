@@ -39,38 +39,38 @@ def form_section() -> rx.Component:
                         "Nueva Entidad",
                         "Editar Entidad",
                     ),
-                    class_name="text-xl font-semibold text-gray-800",
+                    class_name="text-xl font-bold text-gray-900",
                 ),
                 rx.el.div(
                     rx.el.button(
                         "Cancelar",
                         on_click=EntidadesState.cancel_edit,
-                        class_name="px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg transition-colors",
+                        class_name="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors",
                     ),
                     rx.el.button(
                         rx.icon("save", class_name="w-4 h-4 mr-2"),
                         "Guardar",
                         on_click=EntidadesState.save_item,
-                        class_name="flex items-center px-4 py-2 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-sm hover:shadow-md",
+                        class_name="flex items-center px-4 py-2 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-sm",
                     ),
-                    class_name="flex gap-3",
+                    class_name="flex gap-2",
                 ),
                 class_name="flex justify-between items-center pb-6 border-b",
             ),
             rx.el.div(
                 rx.el.h4(
                     "Información General",
-                    class_name="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4",
+                    class_name="text-xs font-medium text-gray-500 uppercase tracking-wider mb-4 mt-4",
                 ),
                 rx.el.div(
                     rx.el.div(
                         rx.el.label(
                             "Código",
-                            class_name="block text-sm font-medium text-gray-700 mb-1.5",
+                            class_name="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1",
                         ),
                         rx.el.input(
                             read_only=True,
-                            class_name="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-gray-500 font-mono text-sm cursor-not-allowed",
+                            class_name="w-full px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-500 cursor-not-allowed",
                             default_value=EntidadesState.selected_item["codigo"],
                             key=EntidadesState.selected_item["codigo"],
                         ),
@@ -83,7 +83,7 @@ def form_section() -> rx.Component:
                         rx.el.div(
                             rx.el.label(
                                 ParametrosGeneralesState.nivel_1,
-                                class_name="block text-sm font-medium text-gray-700 mb-1.5",
+                                class_name="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1",
                             ),
                             rx.el.select(
                                 rx.el.option("Seleccione...", value=""),
@@ -95,7 +95,7 @@ def form_section() -> rx.Component:
                                 ),
                                 value=EntidadesState.selected_parent_nivel1,
                                 on_change=EntidadesState.set_selected_parent_nivel1,
-                                class_name="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all bg-white text-gray-900",
+                                class_name="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all bg-white",
                             ),
                             class_name="col-span-2",
                         ),
@@ -105,7 +105,7 @@ def form_section() -> rx.Component:
                         rx.el.div(
                             rx.el.label(
                                 ParametrosGeneralesState.nivel_2,
-                                class_name="block text-sm font-medium text-gray-700 mb-1.5",
+                                class_name="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1",
                             ),
                             rx.el.select(
                                 rx.el.option("Seleccione...", value=""),
@@ -117,7 +117,7 @@ def form_section() -> rx.Component:
                                 ),
                                 value=EntidadesState.selected_parent_nivel2,
                                 on_change=EntidadesState.set_selected_parent_nivel2,
-                                class_name="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all bg-white text-gray-900",
+                                class_name="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all bg-white",
                             ),
                             class_name="col-span-2",
                         ),
@@ -127,7 +127,7 @@ def form_section() -> rx.Component:
                         rx.el.div(
                             rx.el.label(
                                 ParametrosGeneralesState.nivel_3,
-                                class_name="block text-sm font-medium text-gray-700 mb-1.5",
+                                class_name="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1",
                             ),
                             rx.el.select(
                                 rx.el.option("Seleccione...", value=""),
@@ -139,7 +139,7 @@ def form_section() -> rx.Component:
                                 ),
                                 value=EntidadesState.selected_parent_nivel3,
                                 on_change=EntidadesState.set_selected_parent_nivel3,
-                                class_name="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all bg-white text-gray-900",
+                                class_name="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all bg-white",
                             ),
                             class_name="col-span-2",
                         ),
@@ -149,7 +149,7 @@ def form_section() -> rx.Component:
                         rx.el.div(
                             rx.el.label(
                                 ParametrosGeneralesState.nivel_4,
-                                class_name="block text-sm font-medium text-gray-700 mb-1.5",
+                                class_name="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1",
                             ),
                             rx.el.select(
                                 rx.el.option("Seleccione...", value=""),
@@ -161,7 +161,7 @@ def form_section() -> rx.Component:
                                 ),
                                 value=EntidadesState.selected_parent_nivel4,
                                 on_change=EntidadesState.set_selected_parent_nivel4,
-                                class_name="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all bg-white text-gray-900",
+                                class_name="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all bg-white",
                             ),
                             class_name="col-span-2",
                         ),
@@ -169,12 +169,12 @@ def form_section() -> rx.Component:
                     rx.el.div(
                         rx.el.label(
                             "Descripción",
-                            class_name="block text-sm font-medium text-gray-700 mb-1.5",
+                            class_name="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1",
                         ),
                         rx.el.input(
                             on_change=EntidadesState.set_selected_item_description,
                             placeholder="Ingrese el nombre o descripción...",
-                            class_name="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all bg-white text-gray-900",
+                            class_name="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all bg-white",
                             default_value=EntidadesState.selected_item["descripcion"],
                         ),
                         class_name="col-span-3",
@@ -191,11 +191,11 @@ def form_section() -> rx.Component:
                                 "Registro Activo",
                                 class_name="ml-2 text-sm text-gray-700",
                             ),
-                            class_name="flex items-center",
+                            class_name="flex items-center p-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer",
                         ),
                         class_name="col-span-3",
                     ),
-                    class_name="grid grid-cols-3 gap-6 mb-8",
+                    class_name="grid grid-cols-3 gap-4 mb-8",
                 ),
                 rx.cond(
                     EntidadesState.selected_item["codigo"] != 0,

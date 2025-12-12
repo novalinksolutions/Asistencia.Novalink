@@ -15,10 +15,13 @@ def user_modal() -> rx.Component:
                                 "Editar Usuario",
                                 "Añadir Usuario",
                             ),
-                            class_name="text-lg text-card-foreground",
+                            class_name="text-lg font-bold text-gray-900",
                         ),
                         rx.el.button(
-                            rx.icon("x", class_name="h-5 w-5 text-muted-foreground"),
+                            rx.icon(
+                                "x",
+                                class_name="h-5 w-5 text-gray-500 hover:text-gray-700",
+                            ),
                             on_click=UsuariosState.close_modal,
                             class_name="p-1 rounded-full ios-hover",
                         ),
@@ -26,26 +29,35 @@ def user_modal() -> rx.Component:
                     ),
                     rx.el.form(
                         rx.el.div(
-                            rx.el.label(
-                                "Usuario", class_name="text-sm text-muted-foreground"
+                            rx.el.div(
+                                rx.el.label(
+                                    "Usuario",
+                                    class_name="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1",
+                                ),
+                                rx.el.input(
+                                    name="name",
+                                    max_length=20,
+                                    default_value=UsuariosState.modal_user["name"],
+                                    placeholder="Ej: jdoe",
+                                    class_name="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all bg-white",
+                                ),
+                                class_name="mb-3",
                             ),
-                            rx.el.input(
-                                name="name",
-                                max_length=20,
-                                default_value=UsuariosState.modal_user["name"],
-                                placeholder="Ej: jdoe",
-                                class_name="mt-1 w-full px-5 py-2 rounded-lg border-input bg-background shadow-sm focus:ring-2 focus:ring-ring transition-smooth",
-                            ),
-                            rx.el.label(
-                                "Descripción",
-                                class_name="text-sm mt-4 text-muted-foreground",
-                            ),
-                            rx.el.input(
-                                name="description",
-                                max_length=50,
-                                default_value=UsuariosState.modal_user["description"],
-                                placeholder="Ej: John Doe - Admin",
-                                class_name="mt-1 w-full px-5 py-2 rounded-lg border-input bg-background shadow-sm focus:ring-2 focus:ring-ring transition-smooth",
+                            rx.el.div(
+                                rx.el.label(
+                                    "Descripción",
+                                    class_name="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1",
+                                ),
+                                rx.el.input(
+                                    name="description",
+                                    max_length=50,
+                                    default_value=UsuariosState.modal_user[
+                                        "description"
+                                    ],
+                                    placeholder="Ej: John Doe - Admin",
+                                    class_name="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all bg-white",
+                                ),
+                                class_name="mb-3",
                             ),
                             rx.el.div(
                                 rx.el.label(
@@ -55,15 +67,15 @@ def user_modal() -> rx.Component:
                                         default_checked=UsuariosState.modal_user[
                                             "active"
                                         ],
-                                        class_name="h-4 w-4 rounded border-input text-primary focus:ring-ring",
+                                        class_name="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500",
                                     ),
                                     rx.el.span(
                                         "Activo",
-                                        class_name="ml-2 text-sm text-foreground",
+                                        class_name="ml-2 text-sm text-gray-700",
                                     ),
-                                    class_name="flex items-center",
+                                    class_name="flex items-center p-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer",
                                 ),
-                                class_name="flex flex-col gap-3 mt-4 bg-muted/50 p-3 rounded-lg border",
+                                class_name="flex flex-col gap-3 mt-4 bg-gray-50 p-3 rounded-lg border border-gray-100",
                             ),
                             class_name="py-4",
                         ),
@@ -75,26 +87,26 @@ def user_modal() -> rx.Component:
                                     "Restablecer Contraseña",
                                     type="button",
                                     on_click=UsuariosState.reset_user_password,
-                                    class_name="flex items-center px-4 py-2 bg-amber-100 text-amber-800 border border-amber-200 rounded-lg hover:bg-amber-200 transition-smooth ios-hover mr-auto",
+                                    class_name="flex items-center px-4 py-2 bg-amber-50 text-amber-700 border border-amber-200 rounded-lg hover:bg-amber-100 transition-smooth mr-auto text-sm font-medium",
                                 ),
                                 None,
                             ),
                             rx.el.button(
                                 "Cancelar",
                                 on_click=UsuariosState.close_modal,
-                                class_name="px-4 py-2 bg-button-inactive text-button-inactive-foreground rounded-lg border border-button-inactive-border transition-smooth ios-hover",
+                                class_name="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors",
                             ),
                             rx.el.button(
                                 "Guardar",
                                 type="submit",
-                                class_name="px-4 py-2 bg-primary text-primary-foreground rounded-lg ml-3 transition-smooth ios-hover",
+                                class_name="flex items-center px-4 py-2 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-sm ml-3",
                             ),
                             class_name="flex items-center justify-end pt-4 border-t gap-3",
                         ),
                         on_submit=UsuariosState.handle_submit,
                         reset_on_submit=True,
                     ),
-                    class_name="bg-card rounded-xl shadow-xl p-6 w-full max-w-lg",
+                    class_name="bg-white rounded-xl shadow-xl p-5 w-full max-w-lg",
                 ),
                 class_name="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30 ios-blur",
             ),

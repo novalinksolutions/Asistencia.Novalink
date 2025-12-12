@@ -34,19 +34,19 @@ def form_section() -> rx.Component:
                     "Nuevo Registro",
                     "Editar Registro",
                 ),
-                class_name="text-lg font-medium",
+                class_name="text-lg font-bold text-gray-900",
             ),
             rx.el.div(
                 rx.el.button(
                     "Cancelar",
                     on_click=CatalogoNivel3State.cancel_edit,
-                    class_name="px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-md transition-colors",
+                    class_name="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors",
                 ),
                 rx.el.button(
                     rx.icon("save", class_name="w-4 h-4 mr-2"),
                     "Guardar",
                     on_click=CatalogoNivel3State.save_item,
-                    class_name="flex items-center px-3 py-1.5 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors",
+                    class_name="flex items-center px-4 py-2 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-sm",
                 ),
                 class_name="flex gap-2",
             ),
@@ -55,11 +55,12 @@ def form_section() -> rx.Component:
         rx.el.div(
             rx.el.div(
                 rx.el.label(
-                    "Código", class_name="block text-sm font-medium text-gray-700 mb-1"
+                    "Código",
+                    class_name="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1",
                 ),
                 rx.el.input(
                     read_only=True,
-                    class_name="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-gray-500 cursor-not-allowed",
+                    class_name="w-full px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-500 cursor-not-allowed",
                     default_value=CatalogoNivel3State.selected_item["codigo"],
                     key=CatalogoNivel3State.selected_item["codigo"],
                 ),
@@ -68,12 +69,12 @@ def form_section() -> rx.Component:
             rx.el.div(
                 rx.el.label(
                     "Descripción",
-                    class_name="block text-sm font-medium text-gray-700 mb-1",
+                    class_name="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1",
                 ),
                 rx.el.input(
                     on_change=CatalogoNivel3State.set_selected_item_description,
                     placeholder="Ingrese la descripción...",
-                    class_name="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all",
+                    class_name="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all bg-white",
                     default_value=CatalogoNivel3State.selected_item["descripcion"],
                 ),
                 class_name="mb-4",
@@ -89,7 +90,7 @@ def form_section() -> rx.Component:
                     rx.el.span(
                         "Registro Activo", class_name="ml-2 text-sm text-gray-700"
                     ),
-                    class_name="flex items-center",
+                    class_name="flex items-center p-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer",
                 ),
                 class_name="mb-6",
             ),

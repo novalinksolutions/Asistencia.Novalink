@@ -52,19 +52,19 @@ def dispositivo_dialog() -> rx.Component:
                     "Nuevo Dispositivo",
                     "Editar Dispositivo",
                 ),
-                class_name="text-lg font-bold mb-4",
+                class_name="text-lg font-bold text-gray-900 mb-4",
             ),
             rx.el.div(
                 rx.el.div(
                     rx.el.label(
                         "Código",
-                        class_name="block text-sm font-medium text-gray-700 mb-1",
+                        class_name="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1",
                     ),
                     rx.el.input(
                         on_change=lambda v: ConectividadState.update_current_field(
                             "codigo", v
                         ),
-                        class_name="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500",
+                        class_name="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all bg-white",
                         default_value=ConectividadState.current_dispositivo["codigo"],
                     ),
                     class_name="mb-4",
@@ -72,13 +72,13 @@ def dispositivo_dialog() -> rx.Component:
                 rx.el.div(
                     rx.el.label(
                         "Descripción",
-                        class_name="block text-sm font-medium text-gray-700 mb-1",
+                        class_name="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1",
                     ),
                     rx.el.input(
                         on_change=lambda v: ConectividadState.update_current_field(
                             "descripcion", v
                         ),
-                        class_name="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500",
+                        class_name="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all bg-white",
                         default_value=ConectividadState.current_dispositivo[
                             "descripcion"
                         ],
@@ -93,10 +93,10 @@ def dispositivo_dialog() -> rx.Component:
                             on_change=lambda v: ConectividadState.update_current_field(
                                 "activo", v
                             ),
-                            class_name="rounded border-gray-300 text-blue-600 focus:ring-blue-500 mr-2",
+                            class_name="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500",
                         ),
-                        "Activo",
-                        class_name="flex items-center text-sm text-gray-700",
+                        rx.el.span("Activo", class_name="ml-2 text-sm text-gray-700"),
+                        class_name="flex items-center p-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer",
                     ),
                     class_name="mb-4",
                 ),
@@ -114,16 +114,16 @@ def dispositivo_dialog() -> rx.Component:
                 rx.el.button(
                     "Cancelar",
                     on_click=ConectividadState.close_dialog,
-                    class_name="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500",
+                    class_name="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors",
                 ),
                 rx.el.button(
                     "Guardar",
                     on_click=ConectividadState.save_dispositivo,
-                    class_name="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500",
+                    class_name="flex items-center px-4 py-2 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-sm",
                 ),
                 class_name="flex justify-end gap-3 mt-6",
             ),
-            class_name="bg-white rounded-lg p-6 w-full max-w-md shadow-xl",
+            class_name="bg-white rounded-xl p-6 w-full max-w-md shadow-xl",
         ),
         open=ConectividadState.show_dialog,
         on_open_change=lambda v: ConectividadState.close_dialog(),
@@ -143,7 +143,7 @@ def conectividad_page() -> rx.Component:
                     rx.icon("plus", class_name="h-4 w-4 mr-2"),
                     "Nuevo Dispositivo",
                     on_click=lambda: ConectividadState.open_dialog(None),
-                    class_name="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500",
+                    class_name="flex items-center px-4 py-2 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-sm",
                 ),
                 class_name="flex justify-between items-center mb-6",
             ),
@@ -151,7 +151,7 @@ def conectividad_page() -> rx.Component:
                 rx.el.input(
                     placeholder="Buscar por código o descripción...",
                     on_change=ConectividadState.set_search_query,
-                    class_name="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm",
+                    class_name="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all bg-white text-sm",
                     default_value=ConectividadState.search_query,
                 ),
                 class_name="mb-6 max-w-lg",
