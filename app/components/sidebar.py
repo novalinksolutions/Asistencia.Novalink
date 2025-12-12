@@ -96,7 +96,7 @@ def sidebar() -> rx.Component:
         ),
         class_name=rx.cond(
             BaseState.sidebar_collapsed,
-            "flex flex-col h-screen bg-sidebar-background/95 text-sidebar-foreground border-r border-sidebar-border shadow-lg transition-smooth w-[72px] ios-blur",
-            "flex flex-col h-screen bg-sidebar-background/95 text-sidebar-foreground border-r border-sidebar-border shadow-lg transition-smooth w-72 md:w-[288px] ios-blur",
+            "flex flex-col min-h-screen bg-sidebar-background/95 text-sidebar-foreground border-r border-sidebar-border shadow-lg transition-smooth w-[72px] ios-blur",
+            "flex flex-col min-h-screen bg-sidebar-background/95 text-sidebar-foreground border-r border-sidebar-border shadow-lg transition-smooth w-72 md:w-[288px] ios-blur",
         ),
     )

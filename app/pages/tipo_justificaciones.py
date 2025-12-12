@@ -223,75 +223,69 @@ def tipo_justificaciones_page() -> rx.Component:
             class_name="flex justify-between items-center mb-6 relative",
         ),
         rx.el.div(
-            rx.el.div(
-                rx.el.table(
-                    rx.el.thead(
-                        rx.el.tr(
-                            rx.el.th(
-                                "Descripción",
-                                class_name="px-6 py-3 text-left text-xs text-muted-foreground uppercase tracking-wider",
-                            ),
-                            rx.el.th(
-                                "Estado",
-                                class_name="px-6 py-3 text-left text-xs text-muted-foreground uppercase tracking-wider",
-                            ),
-                            rx.el.th(
-                                "Acciones",
-                                class_name="px-6 py-3 text-right text-xs text-muted-foreground uppercase tracking-wider",
-                            ),
-                        )
-                    ),
-                    rx.el.tbody(
-                        rx.foreach(
-                            TipoJustificacionesState.filtered_justificaciones,
-                            lambda j: rx.el.tr(
-                                rx.el.td(
-                                    j["descripcion"],
-                                    class_name="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground",
-                                ),
-                                rx.el.td(
-                                    rx.el.span(
-                                        rx.cond(j["estado"], "Activo", "Inactivo"),
-                                        class_name=rx.cond(
-                                            j["estado"],
-                                            "px-2 inline-flex text-xs leading-5 rounded-full bg-green-100 text-green-800",
-                                            "px-2 inline-flex text-xs leading-5 rounded-full bg-red-100 text-red-800",
-                                        ),
-                                    ),
-                                    class_name="px-6 py-4 whitespace-nowrap text-sm",
-                                ),
-                                rx.el.td(
-                                    rx.el.button(
-                                        rx.icon(
-                                            "copy", class_name="h-5 w-5 text-primary"
-                                        ),
-                                        on_click=lambda: TipoJustificacionesState.open_edit_modal(
-                                            j
-                                        ),
-                                        class_name="p-2 hover:bg-accent rounded-full transition-smooth",
-                                    ),
-                                    rx.el.button(
-                                        rx.icon(
-                                            "trash-2",
-                                            class_name="h-5 w-5 text-destructive",
-                                        ),
-                                        on_click=lambda: TipoJustificacionesState.delete_justificacion(
-                                            j["id"]
-                                        ),
-                                        class_name="p-2 hover:bg-accent rounded-full transition-smooth",
-                                    ),
-                                    class_name="px-6 py-4 whitespace-nowrap text-right text-sm font-medium",
-                                ),
-                                class_name="bg-card divide-y divide-border",
-                            ),
+            rx.el.table(
+                rx.el.thead(
+                    rx.el.tr(
+                        rx.el.th(
+                            "Descripción",
+                            class_name="px-6 py-3 text-left text-xs text-muted-foreground uppercase tracking-wider",
                         ),
-                        class_name="bg-card divide-y divide-border",
-                    ),
-                    class_name="min-w-full divide-y divide-border",
+                        rx.el.th(
+                            "Estado",
+                            class_name="px-6 py-3 text-left text-xs text-muted-foreground uppercase tracking-wider",
+                        ),
+                        rx.el.th(
+                            "Acciones",
+                            class_name="px-6 py-3 text-right text-xs text-muted-foreground uppercase tracking-wider",
+                        ),
+                    )
                 ),
-                class_name="overflow-hidden border shadow-sm sm:rounded-lg bg-card",
+                rx.el.tbody(
+                    rx.foreach(
+                        TipoJustificacionesState.filtered_justificaciones,
+                        lambda j: rx.el.tr(
+                            rx.el.td(
+                                j["descripcion"],
+                                class_name="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground",
+                            ),
+                            rx.el.td(
+                                rx.el.span(
+                                    rx.cond(j["estado"], "Activo", "Inactivo"),
+                                    class_name=rx.cond(
+                                        j["estado"],
+                                        "px-2 inline-flex text-xs leading-5 rounded-full bg-green-100 text-green-800",
+                                        "px-2 inline-flex text-xs leading-5 rounded-full bg-red-100 text-red-800",
+                                    ),
+                                ),
+                                class_name="px-6 py-4 whitespace-nowrap text-sm",
+                            ),
+                            rx.el.td(
+                                rx.el.button(
+                                    rx.icon("copy", class_name="h-5 w-5 text-primary"),
+                                    on_click=lambda: TipoJustificacionesState.open_edit_modal(
+                                        j
+                                    ),
+                                    class_name="p-2 hover:bg-accent rounded-full transition-smooth",
+                                ),
+                                rx.el.button(
+                                    rx.icon(
+                                        "trash-2", class_name="h-5 w-5 text-destructive"
+                                    ),
+                                    on_click=lambda: TipoJustificacionesState.delete_justificacion(
+                                        j["id"]
+                                    ),
+                                    class_name="p-2 hover:bg-accent rounded-full transition-smooth",
+                                ),
+                                class_name="px-6 py-4 whitespace-nowrap text-right text-sm font-medium",
+                            ),
+                            class_name="bg-card divide-y divide-border",
+                        ),
+                    ),
+                    class_name="bg-card divide-y divide-border",
+                ),
+                class_name="min-w-full divide-y divide-border",
             ),
-            class_name="align-middle inline-block min-w-full",
+            class_name="w-full overflow-x-auto border shadow-sm sm:rounded-lg bg-card",
         ),
         class_name="animate-fade-in-up",
     )
