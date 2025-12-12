@@ -276,10 +276,6 @@ def tab_permisos() -> rx.Component:
                 "Acceso al Portal de Empleados",
                 class_name="text-lg font-medium text-gray-900",
             ),
-            rx.el.p(
-                "Configure si este empleado puede iniciar sesión en la plataforma web para revisar sus roles de pago y asistencia.",
-                class_name="text-sm text-gray-500 mt-1 mb-6 max-w-lg",
-            ),
             rx.el.div(
                 rx.el.label(
                     rx.el.input(
