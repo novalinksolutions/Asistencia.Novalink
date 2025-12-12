@@ -161,15 +161,6 @@ def tab_datos_basicos() -> rx.Component:
                 ),
                 class_name="relative",
             ),
-            rx.cond(
-                ~EmpleadosState.is_email_editable,
-                rx.el.p(
-                    rx.icon("shield-check", class_name="inline h-3 w-3 mr-1"),
-                    "Email enmascarado por seguridad",
-                    class_name="text-[10px] text-gray-400 mt-1 flex items-center",
-                ),
-                None,
-            ),
             class_name="w-full mb-4",
         ),
         rx.el.div(
