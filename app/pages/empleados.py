@@ -271,59 +271,51 @@ def tab_organizacional() -> rx.Component:
 def tab_permisos() -> rx.Component:
     return rx.el.div(
         rx.el.div(
-            rx.el.div(
-                rx.el.h3(
-                    "Acceso al Portal de Empleados",
-                    class_name="text-lg font-medium text-gray-900",
-                ),
-                rx.el.label(
-                    rx.el.input(
-                        type="checkbox",
-                        checked=EmpleadosState.selected_employee["accesoweb"],
-                        on_change=lambda v: EmpleadosState.toggle_bool_field(
-                            "accesoweb", v
-                        ),
-                        class_name="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500",
+            rx.el.label(
+                rx.el.input(
+                    type="checkbox",
+                    checked=EmpleadosState.selected_employee["accesoweb"],
+                    on_change=lambda v: EmpleadosState.toggle_bool_field(
+                        "accesoweb", v
                     ),
-                    rx.el.span(
-                        "Habilitar acceso a interfaz web",
-                        class_name="ml-3 text-sm font-medium text-gray-900",
-                    ),
-                    class_name="flex items-center px-4 py-2 bg-white border border-gray-200 rounded-xl shadow-sm cursor-pointer hover:border-blue-300 transition-all",
+                    class_name="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500",
                 ),
-                class_name="flex justify-between items-center w-full mb-6",
+                rx.el.span(
+                    "Habilitar acceso a interfaz web",
+                    class_name="ml-2 text-sm font-medium text-gray-900",
+                ),
+                class_name="flex items-center cursor-pointer select-none",
             ),
             rx.cond(
                 EmpleadosState.is_pwd_enabled,
                 rx.el.div(
-                    rx.el.label(
-                        "Contraseña de acceso",
-                        class_name="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1",
-                    ),
                     rx.el.div(
                         rx.icon(
                             "lock",
-                            class_name="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400",
+                            class_name="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400",
                         ),
                         rx.el.input(
                             type="password",
                             default_value=EmpleadosState.selected_employee["pwd"],
                             on_change=lambda v: EmpleadosState.set_field("pwd", v),
-                            class_name="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all font-mono",
+                            placeholder="Contraseña",
+                            class_name="w-48 pl-8 pr-3 py-1.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all font-mono text-sm",
                         ),
-                        class_name="relative max-w-xs",
+                        class_name="relative",
                     ),
-                    rx.el.p(
-                        "La contraseña por defecto es '12345678'. Se recomienda cambiarla en el primer inicio de sesión.",
-                        class_name="text-xs text-amber-600 mt-2 flex items-center gap-1",
+                    rx.el.span(
+                        "(Default: '12345678')",
+                        class_name="text-xs text-amber-600 italic whitespace-nowrap",
                     ),
-                    class_name="animate-in fade-in slide-in-from-top-2 duration-300",
+                    class_name="flex items-center gap-3 animate-in fade-in slide-in-from-left-2 duration-200",
                 ),
             ),
-            class_name="flex flex-col items-start w-full mb-6",
+            class_name="flex items-center gap-6 mb-6 h-9",
         ),
         rx.el.div(
-            rx.el.h3("Jerarquía", class_name="text-lg font-medium text-gray-900 mb-4"),
+            rx.el.h3(
+                "Jerarquía", class_name="text-sm font-semibold text-gray-900 mb-3"
+            ),
             rx.el.div(
                 rx.el.div(
                     rx.el.div(
@@ -347,7 +339,7 @@ def tab_permisos() -> rx.Component:
                             ),
                             class_name="flex gap-1",
                         ),
-                        class_name="flex justify-between items-center mb-2",
+                        class_name="flex justify-between items-center mb-1.5",
                     ),
                     rx.el.div(
                         rx.cond(
@@ -362,17 +354,17 @@ def tab_permisos() -> rx.Component:
                                     class_name=rx.cond(
                                         EmpleadosState.selected_list_superior_id
                                         == item["id"],
-                                        "px-3 py-2 text-sm bg-blue-50 text-blue-700 cursor-pointer hover:bg-blue-100",
-                                        "px-3 py-2 text-sm text-gray-700 cursor-pointer hover:bg-gray-50",
+                                        "px-3 py-1.5 text-xs bg-blue-50 text-blue-700 cursor-pointer hover:bg-blue-100",
+                                        "px-3 py-1.5 text-xs text-gray-700 cursor-pointer hover:bg-gray-50",
                                     ),
                                 ),
                             ),
                             rx.el.div(
                                 "Sin superiores asignados",
-                                class_name="px-3 py-2 text-sm text-gray-400 italic",
+                                class_name="px-3 py-1.5 text-xs text-gray-400 italic",
                             ),
                         ),
-                        class_name="border border-gray-200 rounded-lg h-32 overflow-y-auto bg-white divide-y divide-gray-100",
+                        class_name="border border-gray-200 rounded-lg h-24 overflow-y-auto bg-white divide-y divide-gray-100",
                     ),
                     class_name="flex flex-col",
                 ),
@@ -399,7 +391,7 @@ def tab_permisos() -> rx.Component:
                             ),
                             class_name="flex gap-1",
                         ),
-                        class_name="flex justify-between items-center mb-2",
+                        class_name="flex justify-between items-center mb-1.5",
                     ),
                     rx.el.div(
                         rx.cond(
@@ -414,17 +406,17 @@ def tab_permisos() -> rx.Component:
                                     class_name=rx.cond(
                                         EmpleadosState.selected_list_subordinate_id
                                         == item["id"],
-                                        "px-3 py-2 text-sm bg-blue-50 text-blue-700 cursor-pointer hover:bg-blue-100",
-                                        "px-3 py-2 text-sm text-gray-700 cursor-pointer hover:bg-gray-50",
+                                        "px-3 py-1.5 text-xs bg-blue-50 text-blue-700 cursor-pointer hover:bg-blue-100",
+                                        "px-3 py-1.5 text-xs text-gray-700 cursor-pointer hover:bg-gray-50",
                                     ),
                                 ),
                             ),
                             rx.el.div(
                                 "Sin subalternos asignados",
-                                class_name="px-3 py-2 text-sm text-gray-400 italic",
+                                class_name="px-3 py-1.5 text-xs text-gray-400 italic",
                             ),
                         ),
-                        class_name="border border-gray-200 rounded-lg h-32 overflow-y-auto bg-white divide-y divide-gray-100",
+                        class_name="border border-gray-200 rounded-lg h-24 overflow-y-auto bg-white divide-y divide-gray-100",
                     ),
                     class_name="flex flex-col",
                 ),
@@ -475,9 +467,9 @@ def tab_permisos() -> rx.Component:
                 ),
                 class_name="flex flex-col md:flex-row md:justify-between md:items-center gap-4",
             ),
-            class_name="p-6 bg-gray-50/50 rounded-xl border border-gray-100 h-full",
+            class_name="p-4 bg-gray-50/50 rounded-xl border border-gray-100 h-full",
         ),
-        class_name="flex flex-col gap-6",
+        class_name="flex flex-col gap-2",
     )
 
 
