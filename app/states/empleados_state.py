@@ -121,6 +121,31 @@ class EmpleadosState(DatabaseState):
     selected_list_superior_id: int = 0
     selected_list_subordinate_id: int = 0
     employee_to_add_id: str = ""
+    hierarchy_search_query: str = ""
+
+    @rx.var
+    def filtered_hierarchy_employees(self) -> list[HierarchyItem]:
+        if len(self.hierarchy_search_query) < 3:
+            return []
+        query = self.hierarchy_search_query.lower()
+        return [emp for emp in self.available_employees if query in emp["name"].lower()]
+
+    @rx.var
+    def selected_hierarchy_employee_name(self) -> str:
+        if not self.employee_to_add_id:
+            return ""
+        for emp in self.available_employees:
+            if str(emp["id"]) == self.employee_to_add_id:
+                return emp["name"]
+        return ""
+
+    @rx.event
+    def set_hierarchy_search_query(self, value: str):
+        self.hierarchy_search_query = value
+
+    @rx.event
+    def select_hierarchy_employee_from_search(self, emp_id: int):
+        self.employee_to_add_id = str(emp_id)
 
     @rx.var
     def formatted_id(self) -> str:
@@ -546,6 +571,7 @@ class EmpleadosState(DatabaseState):
     async def open_hierarchy_dialog(self, dialog_type: str):
         self.hierarchy_dialog_type = dialog_type
         self.employee_to_add_id = ""
+        self.hierarchy_search_query = ""
         await self.load_available_employees()
         self.show_hierarchy_dialog = True
 

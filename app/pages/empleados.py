@@ -500,21 +500,75 @@ def hierarchy_dialog() -> rx.Component:
                     ),
                     rx.el.div(
                         rx.el.label(
-                            "Seleccione un empleado",
+                            "Buscar empleado",
                             class_name="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1",
                         ),
-                        rx.el.select(
-                            rx.el.option("Seleccione...", value=""),
-                            rx.foreach(
-                                EmpleadosState.available_employees,
-                                lambda emp: rx.el.option(
-                                    emp["name"], value=emp["id"].to(str)
+                        rx.el.div(
+                            rx.icon(
+                                "search",
+                                class_name="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400",
+                            ),
+                            rx.el.input(
+                                placeholder="Escriba al menos 3 letras para buscar...",
+                                on_change=EmpleadosState.set_hierarchy_search_query,
+                                class_name="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all bg-white",
+                                auto_focus=True,
+                                default_value=EmpleadosState.hierarchy_search_query,
+                            ),
+                            class_name="relative mb-2",
+                        ),
+                        rx.cond(
+                            EmpleadosState.employee_to_add_id != "",
+                            rx.el.div(
+                                rx.el.span(
+                                    "Seleccionado: ", class_name="text-xs text-gray-500"
+                                ),
+                                rx.el.span(
+                                    EmpleadosState.selected_hierarchy_employee_name,
+                                    class_name="text-sm font-medium text-blue-600",
+                                ),
+                                class_name="mb-2 p-2 bg-blue-50 rounded border border-blue-100 flex gap-2 items-center",
+                            ),
+                            None,
+                        ),
+                        rx.el.div(
+                            rx.cond(
+                                EmpleadosState.hierarchy_search_query.length() < 3,
+                                rx.el.p(
+                                    "Ingrese al menos 3 caracteres para ver sugerencias.",
+                                    class_name="text-xs text-gray-400 italic p-2",
+                                ),
+                                rx.cond(
+                                    EmpleadosState.filtered_hierarchy_employees.length()
+                                    > 0,
+                                    rx.el.div(
+                                        rx.foreach(
+                                            EmpleadosState.filtered_hierarchy_employees,
+                                            lambda emp: rx.el.div(
+                                                rx.el.span(
+                                                    emp["name"], class_name="text-sm"
+                                                ),
+                                                on_click=lambda: EmpleadosState.select_hierarchy_employee_from_search(
+                                                    emp["id"]
+                                                ),
+                                                class_name=rx.cond(
+                                                    EmpleadosState.employee_to_add_id
+                                                    == emp["id"].to(str),
+                                                    "p-2 hover:bg-blue-50 cursor-pointer rounded border-b border-gray-50 bg-blue-50 text-blue-700 font-medium",
+                                                    "p-2 hover:bg-gray-50 cursor-pointer rounded border-b border-gray-50 text-gray-700",
+                                                ),
+                                            ),
+                                        ),
+                                        class_name="max-h-48 overflow-y-auto border border-gray-200 rounded-lg custom-scrollbar",
+                                    ),
+                                    rx.el.p(
+                                        "No se encontraron coincidencias.",
+                                        class_name="text-xs text-gray-500 p-2",
+                                    ),
                                 ),
                             ),
-                            on_change=EmpleadosState.set_employee_to_add,
-                            class_name="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all bg-white",
+                            class_name="mb-6",
                         ),
-                        class_name="mb-6",
                     ),
                     rx.el.div(
                         rx.el.button(
