@@ -460,8 +460,18 @@ class EmpleadosState(DatabaseState):
                 )
             """
             await self._execute_write(query, target_db="novalink")
+            alter_superior = "ALTER TABLE public.jerarquias ADD COLUMN IF NOT EXISTS empleado_superior BIGINT"
+            await self._execute_write(alter_superior, target_db="novalink")
+            alter_subordinado = "ALTER TABLE public.jerarquias ADD COLUMN IF NOT EXISTS empleado_subordinado BIGINT"
+            await self._execute_write(alter_subordinado, target_db="novalink")
+            alter_fecha = "ALTER TABLE public.jerarquias ADD COLUMN IF NOT EXISTS fechacreacion TIMESTAMP DEFAULT NOW()"
+            await self._execute_write(alter_fecha, target_db="novalink")
+            alter_usuario = (
+                "ALTER TABLE public.jerarquias ADD COLUMN IF NOT EXISTS usuario BIGINT"
+            )
+            await self._execute_write(alter_usuario, target_db="novalink")
         except Exception as e:
-            logging.exception(f"Error creating jerarquias table: {e}")
+            logging.exception(f"Error ensuring jerarquias table: {e}")
 
     @rx.event
     async def load_hierarchy(self):
