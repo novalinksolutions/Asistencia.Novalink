@@ -535,11 +535,9 @@ class EmpleadosState(DatabaseState):
                     """
                     INSERT INTO public.jerarquias (
                         empleado_superior, empleado_subordinado, 
-                        superior, subordinado, 
                         fechacreacion, usuario
                     )
                     VALUES (
-                        :sup_id, :sub_id, 
                         :sup_id, :sub_id, 
                         NOW(), :uid
                     )
@@ -552,11 +550,9 @@ class EmpleadosState(DatabaseState):
                     """
                     INSERT INTO public.jerarquias (
                         empleado_superior, empleado_subordinado, 
-                        superior, subordinado, 
                         fechacreacion, usuario
                     )
                     VALUES (
-                        :sup_id, :sub_id, 
                         :sup_id, :sub_id, 
                         NOW(), :uid
                     )
