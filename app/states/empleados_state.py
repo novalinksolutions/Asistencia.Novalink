@@ -454,7 +454,7 @@ class EmpleadosState(DatabaseState):
                 CREATE TABLE IF NOT EXISTS public.jerarquias (
                     id SERIAL PRIMARY KEY,
                     superior BIGINT,
-                    subordinado BIGINT,
+                    subalterno BIGINT,
                     fechacreacion TIMESTAMP DEFAULT NOW(),
                     usuario BIGINT
                 )
@@ -464,8 +464,8 @@ class EmpleadosState(DatabaseState):
                 "ALTER TABLE public.jerarquias ADD COLUMN IF NOT EXISTS superior BIGINT"
             )
             await self._execute_write(alter_superior, target_db="novalink")
-            alter_subordinado = "ALTER TABLE public.jerarquias ADD COLUMN IF NOT EXISTS subordinado BIGINT"
-            await self._execute_write(alter_subordinado, target_db="novalink")
+            alter_subalterno = "ALTER TABLE public.jerarquias ADD COLUMN IF NOT EXISTS subalterno BIGINT"
+            await self._execute_write(alter_subalterno, target_db="novalink")
             alter_fecha = "ALTER TABLE public.jerarquias ADD COLUMN IF NOT EXISTS fechacreacion TIMESTAMP DEFAULT NOW()"
             await self._execute_write(alter_fecha, target_db="novalink")
             alter_usuario = (
@@ -489,7 +489,7 @@ class EmpleadosState(DatabaseState):
                 SELECT e.id, e.nombres || ' ' || e.apellidos as name
                 FROM public.jerarquias j
                 JOIN public.empleados e ON j.superior = e.id
-                WHERE j.subordinado = :uid
+                WHERE j.subalterno = :uid
             """
             res_sup = await self._execute_query(
                 query_sup, {"uid": emp_id}, target_db="novalink"
@@ -500,7 +500,7 @@ class EmpleadosState(DatabaseState):
             query_sub = """
                 SELECT e.id, e.nombres || ' ' || e.apellidos as name
                 FROM public.jerarquias j
-                JOIN public.empleados e ON j.subordinado = e.id
+                JOIN public.empleados e ON j.subalterno = e.id
                 WHERE j.superior = :uid
             """
             res_sub = await self._execute_query(
@@ -523,7 +523,7 @@ class EmpleadosState(DatabaseState):
         user_id = base_state.logged_user_id or 1
         try:
             await self._execute_write(
-                "DELETE FROM public.jerarquias WHERE subordinado = :uid",
+                "DELETE FROM public.jerarquias WHERE subalterno = :uid",
                 {"uid": emp_id},
                 target_db="novalink",
             )
@@ -536,7 +536,7 @@ class EmpleadosState(DatabaseState):
                 await self._execute_write(
                     """
                     INSERT INTO public.jerarquias (
-                        superior, subordinado, 
+                        superior, subalterno, 
                         fechacreacion, usuario
                     )
                     VALUES (
@@ -551,7 +551,7 @@ class EmpleadosState(DatabaseState):
                 await self._execute_write(
                     """
                     INSERT INTO public.jerarquias (
-                        superior, subordinado, 
+                        superior, subalterno, 
                         fechacreacion, usuario
                     )
                     VALUES (
