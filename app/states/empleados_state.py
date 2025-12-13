@@ -45,6 +45,11 @@ class CatalogItem(TypedDict):
     descripcion: str
 
 
+class HierarchyItem(TypedDict):
+    id: int
+    name: str
+
+
 class EmpleadosState(DatabaseState):
     employees: list[Employee] = []
     selected_employee: Employee = {
@@ -107,6 +112,15 @@ class EmpleadosState(DatabaseState):
     is_email_editable: bool = False
     editing_employee_id: int = 0
     id_input: str = ""
+    superiores: list[HierarchyItem] = []
+    subalternos: list[HierarchyItem] = []
+    available_employees: list[HierarchyItem] = []
+    can_authorize: bool = False
+    show_hierarchy_dialog: bool = False
+    hierarchy_dialog_type: str = "superior"
+    selected_list_superior_id: int = 0
+    selected_list_subordinate_id: int = 0
+    employee_to_add_id: str = ""
 
     @rx.var
     def formatted_id(self) -> str:
@@ -226,6 +240,9 @@ class EmpleadosState(DatabaseState):
     def new_employee(self):
         self.editing_employee_id = 0
         self.id_input = ""
+        self.superiores = []
+        self.subalternos = []
+        self.can_authorize = False
         self.selected_employee = {
             "id": 0,
             "cedula": "",
@@ -263,12 +280,13 @@ class EmpleadosState(DatabaseState):
         self.is_editing = True
 
     @rx.event
-    def select_employee(self, employee: Employee):
+    async def select_employee(self, employee: Employee):
         self.editing_employee_id = employee["id"]
         self.selected_employee = employee.copy()
         self.id_input = f"{employee['id']:010d}"
         self.is_editing = True
         self.is_email_editable = False
+        await self.load_hierarchy()
 
     @rx.event
     def cancel_edit(self):
@@ -374,6 +392,7 @@ class EmpleadosState(DatabaseState):
     @rx.event
     async def on_load(self):
         await self._ensure_tables()
+        await self._ensure_jerarquias_table()
         await self._drop_fk_constraints()
         await self.load_config()
         await self.load_catalogs()
@@ -401,6 +420,199 @@ class EmpleadosState(DatabaseState):
                 await self._execute_write(drop_query, target_db="novalink")
         except Exception as e:
             logging.exception(f"Error dropping foreign keys: {e}")
+
+    async def _ensure_jerarquias_table(self):
+        if not self.has_db_connection:
+            return
+        try:
+            query = """
+                CREATE TABLE IF NOT EXISTS public.jerarquias (
+                    id SERIAL PRIMARY KEY,
+                    empleado_superior BIGINT,
+                    empleado_subordinado BIGINT,
+                    fechacreacion TIMESTAMP DEFAULT NOW(),
+                    usuario BIGINT
+                )
+            """
+            await self._execute_write(query, target_db="novalink")
+        except Exception as e:
+            logging.exception(f"Error creating jerarquias table: {e}")
+
+    @rx.event
+    async def load_hierarchy(self):
+        """Load superiors and subordinates for the selected employee."""
+        self.superiores = []
+        self.subalternos = []
+        self.can_authorize = self.selected_employee["nivelautorizacion"] > 0
+        emp_id = self.selected_employee["id"]
+        if emp_id == 0:
+            return
+        try:
+            query_sup = """
+                SELECT e.id, e.nombres || ' ' || e.apellidos as name
+                FROM public.jerarquias j
+                JOIN public.empleados e ON j.empleado_superior = e.id
+                WHERE j.empleado_subordinado = :uid
+            """
+            res_sup = await self._execute_query(
+                query_sup, {"uid": emp_id}, target_db="novalink"
+            )
+            self.superiores = [
+                HierarchyItem(id=row["id"], name=row["name"]) for row in res_sup
+            ]
+            query_sub = """
+                SELECT e.id, e.nombres || ' ' || e.apellidos as name
+                FROM public.jerarquias j
+                JOIN public.empleados e ON j.empleado_subordinado = e.id
+                WHERE j.empleado_superior = :uid
+            """
+            res_sub = await self._execute_query(
+                query_sub, {"uid": emp_id}, target_db="novalink"
+            )
+            self.subalternos = [
+                HierarchyItem(id=row["id"], name=row["name"]) for row in res_sub
+            ]
+        except Exception as e:
+            logging.exception(f"Error loading hierarchy: {e}")
+
+    @rx.event
+    async def save_hierarchy(self, emp_id: int):
+        """Save the current hierarchy state to the database."""
+        if not self.has_db_connection or emp_id == 0:
+            return
+        from app.states.base_state import BaseState
+
+        base_state = await self.get_state(BaseState)
+        user_id = base_state.logged_user_id or 1
+        try:
+            await self._execute_write(
+                "DELETE FROM public.jerarquias WHERE empleado_subordinado = :uid",
+                {"uid": emp_id},
+                target_db="novalink",
+            )
+            await self._execute_write(
+                "DELETE FROM public.jerarquias WHERE empleado_superior = :uid",
+                {"uid": emp_id},
+                target_db="novalink",
+            )
+            for sup in self.superiores:
+                await self._execute_write(
+                    """
+                    INSERT INTO public.jerarquias (empleado_superior, empleado_subordinado, fechacreacion, usuario)
+                    VALUES (:sup_id, :sub_id, NOW(), :uid)
+                    """,
+                    {"sup_id": sup["id"], "sub_id": emp_id, "uid": user_id},
+                    target_db="novalink",
+                )
+            for sub in self.subalternos:
+                await self._execute_write(
+                    """
+                    INSERT INTO public.jerarquias (empleado_superior, empleado_subordinado, fechacreacion, usuario)
+                    VALUES (:sup_id, :sub_id, NOW(), :uid)
+                    """,
+                    {"sup_id": emp_id, "sub_id": sub["id"], "uid": user_id},
+                    target_db="novalink",
+                )
+        except Exception as e:
+            logging.exception(f"Error saving hierarchy: {e}")
+
+    @rx.event
+    async def load_available_employees(self):
+        """Load employees for selection, excluding current and already related."""
+        self.available_employees = []
+        if not self.has_db_connection:
+            return
+        try:
+            query = """
+                SELECT id, cedula || ' - ' || apellidos || ' ' || nombres as name
+                FROM public.empleados
+                WHERE activo = true
+                ORDER BY apellidos, nombres
+            """
+            results = await self._execute_query(query, target_db="novalink")
+            current_id = self.selected_employee["id"]
+            existing_ids = {current_id}
+            existing_ids.update((s["id"] for s in self.superiores))
+            existing_ids.update((s["id"] for s in self.subalternos))
+            self.available_employees = [
+                HierarchyItem(id=row["id"], name=row["name"])
+                for row in results
+                if row["id"] not in existing_ids
+            ]
+        except Exception as e:
+            logging.exception(f"Error loading available employees: {e}")
+
+    @rx.event
+    async def open_hierarchy_dialog(self, dialog_type: str):
+        self.hierarchy_dialog_type = dialog_type
+        self.employee_to_add_id = ""
+        await self.load_available_employees()
+        self.show_hierarchy_dialog = True
+
+    @rx.event
+    def close_hierarchy_dialog(self):
+        self.show_hierarchy_dialog = False
+
+    @rx.event
+    def set_employee_to_add(self, value: str):
+        self.employee_to_add_id = value
+
+    @rx.event
+    def add_hierarchy_relation(self):
+        if not self.employee_to_add_id:
+            return
+        emp_id = int(self.employee_to_add_id)
+        emp_name = next(
+            (e["name"] for e in self.available_employees if e["id"] == emp_id),
+            "Unknown",
+        )
+        new_item = HierarchyItem(id=emp_id, name=emp_name)
+        if self.hierarchy_dialog_type == "superior":
+            self.superiores.append(new_item)
+        else:
+            self.subalternos.append(new_item)
+        self.close_hierarchy_dialog()
+
+    @rx.event
+    def select_list_superior(self, emp_id: int):
+        self.selected_list_superior_id = emp_id
+
+    @rx.event
+    def select_list_subordinate(self, emp_id: int):
+        self.selected_list_subordinate_id = emp_id
+
+    @rx.event
+    def remove_superior(self):
+        if self.selected_list_superior_id:
+            self.superiores = [
+                s for s in self.superiores if s["id"] != self.selected_list_superior_id
+            ]
+            self.selected_list_superior_id = 0
+
+    @rx.event
+    def remove_subalterno(self):
+        if self.selected_list_subordinate_id:
+            self.subalternos = [
+                s
+                for s in self.subalternos
+                if s["id"] != self.selected_list_subordinate_id
+            ]
+            self.selected_list_subordinate_id = 0
+
+    @rx.event
+    def set_can_authorize(self, checked: bool):
+        self.can_authorize = checked
+        if not checked:
+            self.selected_employee["nivelautorizacion"] = 0
+        elif self.selected_employee["nivelautorizacion"] == 0:
+            self.selected_employee["nivelautorizacion"] = 1
+
+    @rx.event
+    def set_nivel_autorizacion(self, value: str):
+        try:
+            self.selected_employee["nivelautorizacion"] = int(value)
+        except ValueError as e:
+            logging.exception(f"Error converting nivelautorizacion to int: {e}")
 
     @rx.event
     async def load_config(self):
@@ -513,6 +725,10 @@ class EmpleadosState(DatabaseState):
     @rx.event
     async def save_employee(self):
         emp = self.selected_employee
+        if not self.can_authorize:
+            emp["nivelautorizacion"] = 0
+        elif emp["nivelautorizacion"] == 0:
+            emp["nivelautorizacion"] = 1
         emp["nombres"] = emp["nombres"].strip().upper()
         emp["apellidos"] = emp["apellidos"].strip().upper()
         validation_errors = []
@@ -699,6 +915,7 @@ class EmpleadosState(DatabaseState):
                     self.editing_employee_id = new_id
                     self.selected_employee["id"] = new_id
                 yield rx.toast.success("Empleado actualizado correctamente")
+            await self.save_hierarchy(new_id)
             await self.load_employees()
         except Exception as e:
             logging.exception(f"Error saving employee: {e}")
