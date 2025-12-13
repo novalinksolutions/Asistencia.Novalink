@@ -533,8 +533,16 @@ class EmpleadosState(DatabaseState):
             for sup in self.superiores:
                 await self._execute_write(
                     """
-                    INSERT INTO public.jerarquias (empleado_superior, empleado_subordinado, fechacreacion, usuario)
-                    VALUES (:sup_id, :sub_id, NOW(), :uid)
+                    INSERT INTO public.jerarquias (
+                        empleado_superior, empleado_subordinado, 
+                        superior, subordinado, 
+                        fechacreacion, usuario
+                    )
+                    VALUES (
+                        :sup_id, :sub_id, 
+                        :sup_id, :sub_id, 
+                        NOW(), :uid
+                    )
                     """,
                     {"sup_id": sup["id"], "sub_id": emp_id, "uid": user_id},
                     target_db="novalink",
@@ -542,8 +550,16 @@ class EmpleadosState(DatabaseState):
             for sub in self.subalternos:
                 await self._execute_write(
                     """
-                    INSERT INTO public.jerarquias (empleado_superior, empleado_subordinado, fechacreacion, usuario)
-                    VALUES (:sup_id, :sub_id, NOW(), :uid)
+                    INSERT INTO public.jerarquias (
+                        empleado_superior, empleado_subordinado, 
+                        superior, subordinado, 
+                        fechacreacion, usuario
+                    )
+                    VALUES (
+                        :sup_id, :sub_id, 
+                        :sup_id, :sub_id, 
+                        NOW(), :uid
+                    )
                     """,
                     {"sup_id": emp_id, "sub_id": sub["id"], "uid": user_id},
                     target_db="novalink",
