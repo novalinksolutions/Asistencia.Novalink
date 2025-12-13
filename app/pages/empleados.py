@@ -165,7 +165,7 @@ def tab_datos_basicos() -> rx.Component:
         ),
         rx.el.div(
             rx.el.h4(
-                "Configuración de Nómina y Asistencia",
+                "Configuración Adicional",
                 class_name="text-sm font-semibold text-gray-900 mb-3",
             ),
             rx.el.div(
@@ -271,7 +271,6 @@ def tab_organizacional() -> rx.Component:
 def tab_permisos() -> rx.Component:
     return rx.el.div(
         rx.el.div(
-            rx.icon("shield-check", class_name="w-8 h-8 text-blue-600 mb-3"),
             rx.el.h3(
                 "Acceso al Portal de Empleados",
                 class_name="text-lg font-medium text-gray-900",
