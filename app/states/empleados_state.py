@@ -456,10 +456,26 @@ class EmpleadosState(DatabaseState):
                     superior BIGINT,
                     subalterno BIGINT,
                     fechacreacion TIMESTAMP DEFAULT NOW(),
-                    usuario BIGINT
+                    usuariocrea BIGINT
                 )
             """
             await self._execute_write(query, target_db="novalink")
+            drop_cols = [
+                "empleado_superior",
+                "empleado_subordinado",
+                "usuario",
+                "subordinado",
+            ]
+            for col in drop_cols:
+                try:
+                    await self._execute_write(
+                        f"ALTER TABLE public.jerarquias DROP COLUMN IF EXISTS {col}",
+                        target_db="novalink",
+                    )
+                except Exception as e:
+                    logging.exception(
+                        f"Could not drop column {col} from jerarquias: {e}"
+                    )
             alter_superior = (
                 "ALTER TABLE public.jerarquias ADD COLUMN IF NOT EXISTS superior BIGINT"
             )
@@ -468,10 +484,8 @@ class EmpleadosState(DatabaseState):
             await self._execute_write(alter_subalterno, target_db="novalink")
             alter_fecha = "ALTER TABLE public.jerarquias ADD COLUMN IF NOT EXISTS fechacreacion TIMESTAMP DEFAULT NOW()"
             await self._execute_write(alter_fecha, target_db="novalink")
-            alter_usuario = (
-                "ALTER TABLE public.jerarquias ADD COLUMN IF NOT EXISTS usuario BIGINT"
-            )
-            await self._execute_write(alter_usuario, target_db="novalink")
+            alter_usuariocrea = "ALTER TABLE public.jerarquias ADD COLUMN IF NOT EXISTS usuariocrea BIGINT"
+            await self._execute_write(alter_usuariocrea, target_db="novalink")
         except Exception as e:
             logging.exception(f"Error ensuring jerarquias table: {e}")
 
@@ -537,7 +551,7 @@ class EmpleadosState(DatabaseState):
                     """
                     INSERT INTO public.jerarquias (
                         superior, subalterno, 
-                        fechacreacion, usuario
+                        fechacreacion, usuariocrea
                     )
                     VALUES (
                         :sup_id, :sub_id, 
@@ -552,7 +566,7 @@ class EmpleadosState(DatabaseState):
                     """
                     INSERT INTO public.jerarquias (
                         superior, subalterno, 
-                        fechacreacion, usuario
+                        fechacreacion, usuariocrea
                     )
                     VALUES (
                         :sup_id, :sub_id, 
