@@ -271,11 +271,11 @@ def tab_organizacional() -> rx.Component:
 def tab_permisos() -> rx.Component:
     return rx.el.div(
         rx.el.div(
-            rx.el.h3(
-                "Acceso al Portal de Empleados",
-                class_name="text-lg font-medium text-gray-900",
-            ),
             rx.el.div(
+                rx.el.h3(
+                    "Acceso al Portal de Empleados",
+                    class_name="text-lg font-medium text-gray-900",
+                ),
                 rx.el.label(
                     rx.el.input(
                         type="checkbox",
@@ -289,9 +289,9 @@ def tab_permisos() -> rx.Component:
                         "Habilitar acceso a interfaz web",
                         class_name="ml-3 text-sm font-medium text-gray-900",
                     ),
-                    class_name="flex items-center p-4 bg-white border border-gray-200 rounded-xl shadow-sm cursor-pointer hover:border-blue-300 transition-all",
+                    class_name="flex items-center px-4 py-2 bg-white border border-gray-200 rounded-xl shadow-sm cursor-pointer hover:border-blue-300 transition-all",
                 ),
-                class_name="mb-6",
+                class_name="flex justify-between items-center w-full mb-6",
             ),
             rx.cond(
                 EmpleadosState.is_pwd_enabled,
@@ -320,7 +320,7 @@ def tab_permisos() -> rx.Component:
                     class_name="animate-in fade-in slide-in-from-top-2 duration-300",
                 ),
             ),
-            class_name="flex flex-col items-start",
+            class_name="flex flex-col items-start w-full",
         ),
         class_name="p-6 bg-gray-50/50 rounded-xl border border-gray-100 h-full",
     )
